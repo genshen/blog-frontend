@@ -1,0 +1,9 @@
+###
+at assets/sass:
+1. comment: /addons/_wave.scss : //mask: url();
+2. modify: /addons/material-icons/_variables.scss $mdicon-path //todo
+3. /var/_variables 更改全局字体为 "Microsoft Yahei"
+
+
+note:
+修改github localhost
