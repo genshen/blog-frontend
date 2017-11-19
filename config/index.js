@@ -6,12 +6,18 @@ const path = require('path')
 
 module.exports = {
   common: {
-    entry:{
-      app: './src/modules/app/main.js'
-    }
+    entry: {
+      home: './src/modules/home/main.js'
+    },
+
+    // Template
+    pages: [{
+      name: 'home', // entry name.
+      filename: 'views/home/index.html',
+      template: './src/templates/index.ejs',
+    }]
   },
   dev: {
-
     // Paths
     assetsSubDirectory: 'static',
     assetsPublicPath: '/',
@@ -62,8 +68,6 @@ module.exports = {
   },
 
   build: {
-    // Template for index.html
-    index: path.resolve(__dirname, '../dist/index.html'),
 
     // Paths
     assetsRoot: path.resolve(__dirname, '../dist'),
@@ -72,10 +76,10 @@ module.exports = {
 
     //External Resource
     externals: {
-      'vue': 'window.Vue',
-      'vue-router': 'window.VueRouter',
-      'axios': 'window.axios',
-      'marked': 'window.marked'
+      // 'vue': 'window.Vue',
+      // 'vue-router': 'window.VueRouter',
+      // 'axios': 'window.axios',
+      // 'marked': 'window.marked'
     },
     /**
      * Source Maps

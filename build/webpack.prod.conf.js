@@ -54,28 +54,10 @@ const webpackConfig = merge(baseWebpackConfig, {
     // duplicated CSS from different components can be deduped.
     new OptimizeCSSPlugin({
       cssProcessorOptions: config.build.productionSourceMap
-      ? { safe: true, map: { inline: false } }
-      : { safe: true }
+        ? {safe: true, map: {inline: false}}
+        : {safe: true}
     }),
-    // generate dist index.html with correct asset hash for caching.
-    // you can customize output by editing /index.html
-    // see https://github.com/ampedandwired/html-webpack-plugin
-    new HtmlWebpackPlugin({
-      filename: process.env.NODE_ENV === 'testing'
-        ? 'index.html'
-        : config.build.index,
-      template: './src/templates/index.ejs',
-      inject: true,
-      minify: {
-        removeComments: true,
-        collapseWhitespace: true,
-        removeAttributeQuotes: true
-        // more options:
-        // https://github.com/kangax/html-minifier#options-quick-reference
-      },
-      // necessary to consistently work with multiple chunks via CommonsChunkPlugin
-      chunksSortMode: 'dependency'
-    }),
+
     // keep module.id stable when vender modules does not change
     new webpack.HashedModuleIdsPlugin(),
     // enable scope hoisting
@@ -90,9 +72,9 @@ const webpackConfig = merge(baseWebpackConfig, {
             ( /\.js$/.test(module.resource) &&
               module.resource.indexOf(
                 path.join(__dirname, '../node_modules')
-              ) === 0 
+              ) === 0
             ) ||
-              module.resource.indexOf(path.join(__dirname, '../src/sass')) === 0
+            module.resource.indexOf(path.join(__dirname, '../src/sass')) === 0
           )
         )
       }
@@ -107,12 +89,12 @@ const webpackConfig = merge(baseWebpackConfig, {
     // in a separate chunk, similar to the vendor chunk
     // see: https://webpack.js.org/plugins/commons-chunk-plugin/#extra-async-commons-chunk
     new webpack.optimize.CommonsChunkPlugin({
-      name: 'app',
+      name: 'home',
       async: 'vendor-async',
       children: true,
       minChunks: 3
     }),
-    
+
     // copy custom static assets
     new CopyWebpackPlugin([
       {
@@ -123,6 +105,33 @@ const webpackConfig = merge(baseWebpackConfig, {
     ])
   ]
 })
+
+// generate dist index.html with correct asset hash for caching.
+// you can customize output by editing /index.html
+// see https://github.com/ampedandwired/html-webpack-plugin
+for (let index in config.common.pages) {
+  const page = config.common.pages[index]
+  let conf = {
+    /**
+     filename: process.env.NODE_ENV === 'testing'
+     ? 'index.html': config.build.index,
+     */
+    filename: page.filename,
+    template: page.template,
+    inject: true,
+    chunks: ['manifest', 'vendor', page.name],
+    minify: {
+      removeComments: true,
+      collapseWhitespace: true,
+      removeAttributeQuotes: true
+      // more options:
+      // https://github.com/kangax/html-minifier#options-quick-reference
+    },
+    // necessary to consistently work with multiple chunks via CommonsChunkPlugin
+    chunksSortMode: 'dependency'
+  }
+  webpackConfig.plugins.push(new HtmlWebpackPlugin(conf))
+}
 
 if (config.build.productionGzip) {
   const CompressionWebpackPlugin = require('compression-webpack-plugin')
