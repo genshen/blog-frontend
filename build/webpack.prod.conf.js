@@ -64,7 +64,7 @@ const webpackConfig = merge(baseWebpackConfig, {
       filename: process.env.NODE_ENV === 'testing'
         ? 'index.html'
         : config.build.index,
-      template: 'index.html',
+      template: './src/templates/index.ejs',
       inject: true,
       minify: {
         removeComments: true,
@@ -86,11 +86,14 @@ const webpackConfig = merge(baseWebpackConfig, {
       minChunks: function (module) {
         // any required modules inside node_modules are extracted to vendor
         return (
-          module.resource &&
-          /\.js$/.test(module.resource) &&
-          module.resource.indexOf(
-            path.join(__dirname, '../node_modules')
-          ) === 0
+          module.resource && (
+            ( /\.js$/.test(module.resource) &&
+              module.resource.indexOf(
+                path.join(__dirname, '../node_modules')
+              ) === 0 
+            ) ||
+              module.resource.indexOf(path.join(__dirname, '../src/sass')) === 0
+          )
         )
       }
     }),
@@ -109,7 +112,7 @@ const webpackConfig = merge(baseWebpackConfig, {
       children: true,
       minChunks: 3
     }),
-
+    
     // copy custom static assets
     new CopyWebpackPlugin([
       {
