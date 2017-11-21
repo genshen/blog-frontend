@@ -64,7 +64,7 @@
     <div class="container">
       <ul class="row breadcrumb" style="margin-bottom: 0">
         <li>
-          <router-link :to="{name:'menu'}">首页</router-link>
+          <router-link :to="{name:'panel'}">首页</router-link>
         </li>
         <li class="active"><a href="javascript:void(0)">设置</a></li>
         <li class="active"><a href="javascript:void(0)">栏目分类</a></li>

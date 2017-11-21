@@ -6,22 +6,9 @@
           <div class="modal-heading">
             <p class="modal-title">上传图片</p>
           </div>
-          <div class="modal-inner upload-image-field">
-            <input @change="onUploadImageSelected" style="display: none" id="upload_image_input"
-                   type="file" name="file" multiple accept="image/*"/>
-            <div v-for="(image,index) in images" class="upload-image-preview">
-              <div class="image-item">
-                <img :src="image.src"/>
-                <a v-if="image.status == -1" class="image-status" @click="uploadImageToServer(index)"
-                   href="javascript:void(0)">重试</a>
-                <a v-if="image.status == 0" class="image-status" href="javascript:void(0)">等待上传</a>
-                <a v-if="image.status == 1" class="image-status" href="javascript:void(0)">正在上传</a>
-                <a v-if="image.status == 2" class="image-status" @click="deleteUploadImage(index)"
-                   href="javascript:void(0)">删除</a>
-              </div>
-            </div>
-            <a class="add-image waves-effect waves-attach waves-circle fbtn fbtn-lg" @click="addUploadImage">
-              <i class="icon">add</i></a>
+          <div class="modal-inner">
+            <ImageUpload v-if="imageUploadComponentStatus" @on-success="onImageUploadSuccess"
+                         @on-fail="onImageUploadFail" :option="upload_config"></ImageUpload>
           </div>
           <div class="modal-footer">
             <p class="text-right">
@@ -104,6 +91,7 @@
 
 <script>
   import Markdown from '../../../../common/components/markdown'
+  import ImageUpload from '../../../../common/components/image-upload'
   import LocalUtils from '../utils/utils'
   import ApiMap from '../utils/api_map'
   import Util from '../../../../common/libs/utils/util'
@@ -112,10 +100,10 @@
     data: function () {
       return {
         categories: [],
-        upload_config: {token: '', upload_path: '', domain: ''},
-        image_uploading_processing: false,
-        images: [], // {src:"blobUrl",status:0,file:fileObject}  //status:-1上传失败,0等待上传,1正在上传,2上传完成
-        markedStatus: false,
+        image_file_domain: '',
+        upload_config: {upload_path: '', custom_upload: false, data: {token: ''}},
+        imageUploadComponentStatus: false,
+//        images: [], // {src:"blobUrl",status:0,file:fileObject}  //status:-1上传失败,0等待上传,1正在上传,2上传完成
         article_title: '',
         field_category_id: 0,
         field_sub_category_id: 0,
@@ -123,7 +111,8 @@
       }
     },
     components: {
-      'markdown': Markdown
+      Markdown,
+      ImageUpload
     },
     methods: {
       getUploadToken: function () {
@@ -131,66 +120,29 @@
           url: ApiMap.common.upload_token,
           context: this,
           success: function (data) {
-            this.upload_config = data
+            this.image_file_domain = data.domain
+            this.upload_config.upload_path = data.upload_path
+            this.upload_config.data.token = data.token // todo v-if
+            this.imageUploadComponentStatus = true
           },
           error: function (req, err) {
             $('body').snackbar({alive: 3000, content: '加载上传配置信息出错了'})
           }
         })
       },
-      addUploadImage: function () {
-        if (this.upload_config.token) { // check upload_token
-          $('#upload_image_input').trigger('click')
-        } else {
-          $('body').snackbar({alive: 3000, content: 'UploadToken无效'})
+      onImageUploadSuccess (image, data) {
+        try {
+          this.article_content += '![image](' + this.image_file_domain + data.key + ')\r\n'  // qiniu file upload.
+          image.status = 2
+        } catch (e) {
+          image.status = -1
+          this.onImageUploadFail(image, e)
         }
       },
-      onUploadImageSelected: function () {
-        let files = $('#upload_image_input')[0].files
-        let baseLength = this.images.length
-        for (let i = 0; i < files.length; i++) {
-          let src = window.URL.createObjectURL(files[i])
-          this.images.push({src: src, status: 0, file: files[i]})
-          this.uploadImageToServer(baseLength + i)
-        }
+      onImageUploadFail (image, err) {
+        $('body').snackbar({alive: 3000, content: '上传出错了'})
       },
-      uploadImageToServer: function (index) {
-        if (index < this.images.length) {
-          let image = this.images[index]
-          let data = new FormData()
-          data.append('token', this.upload_config.token)
-          data.append('file', image.file)
-          image.status = 1
-          $.ajax({
-            url: this.upload_config.upload_path,
-            type: 'POST',
-            data: data,
-            context: this,
-            cache: false,
-            processData: false,
-            contentType: false,
-            success: function (data) {
-              try {
-                this.article_content += '![image](' + this.upload_config.domain + data.key + ')\r\n'
-                image.status = 2
-              } catch (e) {
-                $('body').snackbar({alive: 3000, content: '上传出错了'})
-                image.status = -1
-              }
-            },
-            error: function () {
-              $('body').snackbar({alive: 3000, content: '上传出错了'})
-              image.status = -1
-            }
-          })
-        } // end if
-      },
-      deleteUploadImage: function (index) {
-        if (index < this.images.length) {
-          this.images.splice(index, 1)
-        }
-      },
-      submit: function () {
+      submit () {
         if (!this.article_title) {
           $('body').snackbar({content: '标题不能为空', alive: 4000})
           return
@@ -225,19 +177,8 @@
         return []
       }
     },
-    created: function () {
-      if (!this.markedStatus) {
-        let self = this
-        LocalUtils.loadCategories(this, this.categories)  // todo
-      //  loadJS([Config.markedLibPath, Config.highlightLibPath, Config.mathJaxLibPath], function () {
-        // Marked.setOptions({
-        //   highlight: function (code) {
-        //     return hljs.highlightAuto(code).value
-        //   }
-        // })
-        self.markedStatus = true // todo remove status
-//        })
-      }
+    created () {
+      LocalUtils.loadCategories(this, this.categories)
       // get image upload token
       this.getUploadToken()
     }

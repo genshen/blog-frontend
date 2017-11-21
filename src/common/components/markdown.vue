@@ -1,12 +1,6 @@
-<style scoped>
-  .improve_me {
-    padding-top: 6px;
-    text-align: right;
-  }
-</style>
 <style>
   /*markdown style */
-  .marked-render code {
+  .marked-render pre,.marked-render pre code {
     border: none;
   }
 
@@ -20,7 +14,7 @@
   }
 </style>
 <style lang="scss">
-  @import '../../../node_modules/prismjs/themes/prism.css';
+  @import '../../common/libs/prism/themes/prism.css';
 </style>
 
 <template>

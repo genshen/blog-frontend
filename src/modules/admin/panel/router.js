@@ -1,6 +1,7 @@
 import Vue from 'vue'
 import VueRouter from 'vue-router'
 import Util from '../../../common/libs/utils/util'
+import ApiMap from './utils/api_map'
 
 Vue.use(VueRouter)
 
@@ -10,11 +11,11 @@ Vue.use(VueRouter)
 const routersMap = [
   {
     path: '/',
-    name: 'home',
+    name: 'panel',
     meta: {
-      title: 'Admin Home'
+      title: 'Panel Home'
     },
-    component: (resolve) => require(['./views/home.vue'], resolve)
+    component: (resolve) => require(['./views/panel.vue'], resolve)
   },
   {
     path: '/article/',
@@ -41,6 +42,7 @@ const routersMap = [
 ]
 
 const RouterConfig = {
+  base: ApiMap.common.prefix,
   mode: 'history',
   routes: routersMap
 }

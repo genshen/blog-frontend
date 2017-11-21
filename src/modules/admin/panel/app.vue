@@ -1,5 +1,27 @@
-<style scoped="">
+<style scoped>
+  .ui-admin-content {
+    margin-top: 55px;
+    margin-bottom: 92px;
+  }
 
+  .ui-footer {
+    border-top: 1px solid rgba(0, 0, 0, .12);
+    text-align: center;
+    padding-top: 12px;
+    padding-bottom: 12px;
+    position: absolute;
+    bottom: 0;
+    right: 0;
+    left: 0;
+  }
+
+  textarea {
+    resize: none
+  }
+
+  .header-nav-menu i {
+    color: #fff
+  }
 </style>
 <template>
   <div class="page-brand">
@@ -12,19 +34,19 @@
         </li>
       </ul>
       <router-link class="header-logo header-affix-hide margin-left-no margin-right-no" data-offset-top="213"
-                   :to="{name:'menu'}" data-spy="affix" href="javascript:void(0)">Admin Home</router-link>
+                   :to="{name:'panel'}" data-spy="affix" href="javascript:void(0)">Panel Home</router-link>
       <ul class="nav nav-list pull-right">
         <li class="dropdown header-nav-menu">
           <a class="btn btn-flat btn-brand waves-attach waves-effect" href="#">
-            <i class="material-icons">face</i>
+            <i class="icon icon-lg">face</i>
           </a>
         </li>
         <li>
           <a data-toggle="menu" href="#ui_menu_profile">
             <span class="access-hide">John Smith</span>
             <span class="avatar avatar-sm">
-                     <img alt="avatar" src="/assets/img/avatar.jpg">
-                </span>
+              <img alt="avatar" src="/assets/img/avatar.jpg">
+            </span>
           </a>
         </li>
       </ul>
@@ -38,9 +60,10 @@
           </div>
           <div class="menu-top-info">
             <a class="menu-top-user" href="javascript:void(0)">
-                    <span class="avatar avatar-inline margin-right">
-                   <img alt="avatar" src="/assets/img/avatar.jpg">
-                    </span><span>Admin</span>
+              <span class="avatar avatar-inline margin-right">
+                <img alt="avatar" src="/assets/img/avatar.jpg">
+              </span>
+              <span>Admin</span>
             </a>
           </div>
           <div class="menu-top-info-sub">

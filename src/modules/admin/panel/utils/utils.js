@@ -5,7 +5,7 @@ let utils = {}
 // container:Array, which includes those categories
 utils.loadCategories = function (context, container) {
   $.ajax({
-    url: ApiMap.settings.categories,
+    url: ApiMap.category.get,
     success: function (data) {
       try {
         if (data) {

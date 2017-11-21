@@ -1,8 +1,8 @@
 import Config from '../../../../common/config/config'
 
-const ADMIN_PREFIX = Config.ajaxDomain + '/admin'
-const ADMIN_API_PREFIX = ADMIN_PREFIX + '/api'
-const ADMIN_SIGN_OUT_PATH = '/admin/auth/sign_out'
+const ADMIN_PREFIX = '/admin'
+const ADMIN_API_PREFIX = Config.ajaxDomain + ADMIN_PREFIX + '/api'
+const ADMIN_SIGN_OUT_PATH = Config.ajaxDomain + ADMIN_PREFIX + '/auth/sign_out'
 
 /**
  var Config = {
@@ -19,14 +19,16 @@ const ADMIN_SIGN_OUT_PATH = '/admin/auth/sign_out'
  */
 const map = {
   common: {
+    prefix: ADMIN_PREFIX,
     upload_token: ADMIN_API_PREFIX + '/upload_token'
   },
   article: {
     list: ADMIN_API_PREFIX,
-    publish: ADMIN_API_PREFIX + '/article/publish/',
+    publish: ADMIN_API_PREFIX + '/article/publish',
     edit: ''
   },
   category: {
+    get: ADMIN_API_PREFIX + '/categories',
     add: ADMIN_API_PREFIX + '/category/add',
     sub_add: ADMIN_API_PREFIX + '/sub_category/add'
   },
