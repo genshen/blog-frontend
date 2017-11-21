@@ -88,18 +88,23 @@ const webpackConfig = merge(baseWebpackConfig, {
     // This instance extracts shared chunks from code splitted chunks and bundles them
     // in a separate chunk, similar to the vendor chunk
     // see: https://webpack.js.org/plugins/commons-chunk-plugin/#extra-async-commons-chunk
-    new webpack.optimize.CommonsChunkPlugin({
-      name: 'home',
+    new webpack.optimize.CommonsChunkPlugin({  // todo
+      name: ['app', 'admin/auth', 'admin/panel'],
       async: 'vendor-async',
       children: true,
       minChunks: 3
     }),
 
-    // copy custom static assets
+    // copy custom static assets and views
     new CopyWebpackPlugin([
       {
-        from: path.resolve(__dirname, '../static'),
-        to: config.build.assetsSubDirectory,
+        from: path.resolve(__dirname, '../static/assets'),
+        to: config.build.externalResourceDirectory,
+        ignore: ['.*']
+      },
+      {
+        from: path.resolve(__dirname, '../static/views'),
+        to: config.build.externalViewsDirectory,
         ignore: ['.*']
       }
     ])

@@ -33,6 +33,10 @@ const devWebpackConfig = merge(baseWebpackConfig, {
       poll: config.dev.poll,
     }
   },
+  output: {
+    filename: utils.assetsPath('[name].js'),
+    publicPath: config.dev.assetsPublicPath
+  },
   plugins: [
     new webpack.DefinePlugin({
       'process.env': require('../config/dev.env')
@@ -52,7 +56,7 @@ for (let index in config.common.pages) {
     chunks: [page.name],
     inject: true
   }
-  webpackConfig.plugins.push(new HtmlWebpackPlugin(conf))
+  devWebpackConfig.plugins.push(new HtmlWebpackPlugin(conf))
 }
 
 module.exports = new Promise((resolve, reject) => {

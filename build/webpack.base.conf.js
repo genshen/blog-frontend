@@ -12,7 +12,7 @@ module.exports = {
   context: path.resolve(__dirname, '../'),
   entry: config.common.entry,
   output: {
-    path: config.build.assetsRoot,
+    path: config.build.assetsRoot,  // ignored in dev webpack-web-server mode
     filename: '[name].js',
     publicPath: process.env.NODE_ENV === 'production'
       ? config.build.assetsPublicPath

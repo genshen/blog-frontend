@@ -6,29 +6,39 @@ const path = require('path')
 
 module.exports = {
   common: {
-    entry: {
-      home: './src/modules/home/main.js'
+    entry: {  // relative code: /build/webpack.prod.conf.js#91
+      app: './src/modules/home/main.js',
+      'admin/auth': './src/modules/admin/auth/sign_in.js',
+      'admin/panel': './src/modules/admin/panel/main.js'
     },
 
     // Template
     pages: [{
-      name: 'home', // entry name.
+      name: 'app', // entry name.
       filename: 'views/home/index.html',
+      template: './src/templates/index.ejs',
+    }, {
+      name: 'admin/auth',
+      filename: 'views/admin/auth/sign_in.html',
+      template: './src/templates/index.ejs',
+    }, {
+      name: 'admin/panel',
+      filename: 'views/admin/panel/index.html',
       template: './src/templates/index.ejs',
     }]
   },
   dev: {
     // Paths
-    assetsSubDirectory: 'static',
+    assetsSubDirectory: 'static/',
     assetsPublicPath: '/',
     proxyTable: {
-      '/at': {
-        target: 'http://localhost',
-        changeOrigin: true,
-        pathRewrite: {
-          '^/at': '/at'   //api
-        }
-      }
+      // '/at': {
+      //   target: 'http://localhost',
+      //   changeOrigin: true,
+      //   pathRewrite: {
+      //     '^/at': '/at'   //api
+      //   }
+      // }
     },
 
     // Various Dev Server settings
@@ -73,6 +83,8 @@ module.exports = {
     assetsRoot: path.resolve(__dirname, '../dist'),
     assetsSubDirectory: 'static',
     assetsPublicPath: '/',
+    externalResourceDirectory: 'static/assets', // assetsSubDirectory + 'assets'
+    externalViewsDirectory: 'views',
 
     //External Resource
     externals: {

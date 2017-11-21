@@ -37,8 +37,8 @@
   </div>
 </template>
 <script>
-  import Util from '../../../common/libs/util'
-  import Config from '../../../common/config/config'
+  import ApiMap from '../api_map'
+  import Util from '../../../common/libs/utils/util'
 
   export default {
     data: function () {
@@ -61,7 +61,7 @@
       this.$parent.$refs.topProgress.start()
       let self = this
       $.ajax({
-        url: Config.ajaxDomain + Config.apiPrefix + '/category', // todo different category
+        url: ApiMap.list.category, // todo different category
         success: function (data) { // if it is not json?
           try {
             self.$parent.$refs.topProgress.done()

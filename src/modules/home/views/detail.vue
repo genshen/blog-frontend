@@ -77,99 +77,7 @@
     resize: none;
   }
 </style>
-<style>
-  /*markdown style */
-  .markdown-preview code {
-    border: none;
-  }
 
-  .markdown-preview h1, .markdown-preview h2, .markdown-preview h3, .markdown-preview h4, .markdown-preview h5, .markdown-preview h6 {
-    margin-top: 12px;
-  }
-
-  .markdown-preview img {
-    max-width: 100%;
-    overflow-x: scroll;
-  }
-
-  /*
-      based on Paraíso (light)
-      Created by Jan T. Sott (http://github.com/idleberg)
-      Inspired by the art of Rubens LP (http://www.rubenslp.com.br)
-  */
-  /* Paraíso Comment */
-  .hljs-comment,
-  .hljs-quote {
-    color: #776e71;
-  }
-
-  /* Paraíso Red */
-  .hljs-variable,
-  .hljs-template-variable,
-  .hljs-tag,
-  .hljs-name,
-  .hljs-selector-id,
-  .hljs-selector-class,
-  .hljs-regexp,
-  .hljs-link,
-  .hljs-meta {
-    color: #ef6155;
-  }
-
-  /* Paraíso Orange */
-  .hljs-number,
-  .hljs-built_in,
-  .hljs-builtin-name,
-  .hljs-literal,
-  .hljs-type,
-  .hljs-params,
-  .hljs-deletion {
-    color: #f99b15;
-  }
-
-  /* Paraíso Yellow */
-  .hljs-title,
-  .hljs-section,
-  .hljs-attribute {
-    color: #fec418;
-  }
-
-  .hljs-string {
-    color: #ff4081;
-  }
-
-  .hljs-symbol,
-  .hljs-bullet,
-  .hljs-addition {
-    color: #48b685;
-  }
-
-  /* Paraíso Purple */
-  .hljs-keyword {
-    color: #4CAF50;
-    font-weight: 600;
-  }
-
-  .hljs-selector-tag {
-    color: #F44336;
-  }
-
-  .hljs {
-    display: block;
-    overflow-x: auto;
-    background: #e7e9db;
-    color: #4f424c;
-    padding: 0.5em;
-  }
-
-  .hljs-emphasis {
-    font-style: italic;
-  }
-
-  .hljs-strong {
-    font-weight: bold;
-  }
-</style>
 <template>
   <div class="detail-container">
     <div class="content-header ui-content-header">
@@ -185,21 +93,23 @@
     <div class="container">
       <div class="row">
         <div class="blog-detail-mate col-md-12 col-lg-10 col-lg-push-1">
-                    <span class="avatar inline-avatar">
-                        <a :href="settings.profile.url" target="_blank">
-                            <img alt="Avatar" :src="settings.profile.avatar">
-                        </a>
-                    </span>
+          <span class="avatar inline-avatar">
+            <a :href="settings.profile.url" target="_blank">
+              <img alt="Avatar" :src="settings.profile.avatar">
+            </a>
+          </span>
           <span class="refer-me">
-                        By <a :href="settings.profile.url"
-                              target="_blank">{{settings.profile.name}}</a>&nbsp;·&nbsp;</span>
+            By <a :href="settings.profile.url"
+                  target="_blank">{{settings.profile.name}}</a>&nbsp;·&nbsp;</span>
           <span class="label label-brand" :title="article.created_at">{{article.created_at | formatTime}}</span>
         </div>
       </div>
       <div class="row">
         <div class="col-md-12 col-lg-10 col-lg-push-1 blog-article markdown-preview">
           <hr>
-          <article v-html="compiledMarkdown"></article>
+          <article class="markdown-preview">
+            <Markdown :marked="article.content"></Markdown>
+          </article>
           <hr>
         </div>
       </div>
@@ -224,14 +134,14 @@
             <div v-for="(comment,comment_index) in comments" :class="{'comments-border':comment_index != 0}"
                  class="col-md-12 comment-item">
               <div class="comment-mate">
-                                     <span class="avatar inline-avatar">
-                                        <a :href="comment.user.url" target="_blank">
-                                            <img alt="Avatar" :src="comment.user.avatar">
-                                        </a>
-                                    </span>
+                <span class="avatar inline-avatar">
+                  <a :href="comment.user.url" target="_blank">
+                    <img alt="Avatar" :src="comment.user.avatar">
+                  </a>
+                </span>
                 <span class="user-refer">
-                                    <a :href="comment.user.url" target="_blank">{{comment.user.name}}</a>&nbsp;
-                                </span>
+                  <a :href="comment.user.url" target="_blank">{{comment.user.name}}</a>&nbsp;
+                </span>
                 <span class="label label-brand"
                       :title="comment.create_at">{{comment.create_at | formatTime}}</span>
                 <a @click="toggleReplyBox(comment_index,-1)" href="javascript:void(0)"
@@ -245,14 +155,14 @@
               <div class="reply-area row">
                 <div v-for="(reply,reply_index) in comment.replies" class="clo-md-12 reply-item">
                   <div class="comment-mate">
-                                             <span class="avatar inline-avatar">
-                                                <a :href="reply.user.url" target="_blank">
-                                                    <img alt="Avatar" :src="reply.user.avatar">
-                                                </a>
-                                            </span>
+                    <span class="avatar inline-avatar">
+                      <a :href="reply.user.url" target="_blank">
+                        <img alt="Avatar" :src="reply.user.avatar">
+                      </a>
+                    </span>
                     <span class="user-refer">
-                                                <a :href="reply.user.url" target="_blank">{{reply.user.name}}</a>&nbsp;
-                                            </span>
+                      <a :href="reply.user.url" target="_blank">{{reply.user.name}}</a>&nbsp;
+                    </span>
                     <span class="label label-brand"
                           :title="reply.create_at">{{reply.create_at | formatTime}}</span>
                     <a @click="toggleReplyBox(comment_index,reply_index)" href="javascript:void(0)"
@@ -320,10 +230,10 @@
   </div>
 </template>
 <script>
-  import Util from '../../../common/libs/util'
+  import Markdown from '../../../common/components/markdown'
+  import ApiMap from '../api_map'
+  import Util from '../../../common/libs/utils/util'
   import Config from '../../../common/config/config'
-  import Marked from 'marked'
-  import hljs from 'highlight.js'
 
   export default {
     props: ['settings'],
@@ -348,13 +258,11 @@
         comment_text: ''
       }
     },
-    computed: {
-      compiledMarkdown: function () {
-        return Marked(this.article.content)
-      }
+    components: {
+      Markdown
     },
     methods: {
-      setCommentLoad: function () {
+      setCommentLoad () {
         if (document.getElementById('comment-flag').offsetTop < document.documentElement.clientHeight) {
           this.loadComment()
         } else {
@@ -368,7 +276,7 @@
           })
         }
       },
-      loadComment: function () {
+      loadComment () {
         if (this.comment_load_status === 0 || this.comment_load_status === 1) {
           return
         }
@@ -376,7 +284,7 @@
         this.comment_load_status = start === 0 ? 0 : 1
         let self = this
         $.ajax({
-          url: Config.ajaxDomain + Config.apiPrefix + '/comments/' + this.$route.params.id + '/' + start,
+          url: ApiMap.detail.comments(this.$route.params.id, start),
           success: function (data) {
             try {
               data.forEach(function (e) {
@@ -424,7 +332,7 @@
         }
 
         let self = this
-        Util.network.postData.init(Config.ajaxDomain + Config.apiPrefix + '/comment/add/', {  // todo
+        Util.network.postData.init(ApiMap.detail.commentAdd, {  // todo
           post_id: this.article.id, content: this.comment_text
         }, null, function (data) {
           self.comments.unshift({
@@ -455,7 +363,7 @@
         }
 
         let self = this
-        Util.network.postData.init(Config.ajaxDomain + Util.config.apiPrefix + '/reply/add/', {
+        Util.network.postData.init(ApiMap.detail.replyAdd, {
           comment_id: commentSelf.id, content: commentSelf.new_reply_content
         }, null, function (data) {
           try {
@@ -497,18 +405,18 @@
         }, 200)
       }
     },
-    beforeCreate () {
-      Marked.setOptions({
-        highlight: function (code) {
-          return hljs.highlightAuto(code).value
-        }
-      })
-    },
+//    beforeCreate () {
+//      Marked.setOptions({
+//        highlight: function (code) {
+//          return hljs.highlightAuto(code).value
+//        }
+//      })
+//    },
     mounted: function () {
       let self = this
       $.ajax({
-        url: Util.config.ajaxDomain + Util.config.apiPrefix + '/detail/' + this.$route.params.id,
-        success: function (data) { // if it is not json?
+        url: ApiMap.detail.content(this.$route.params.id),
+        success: function (data) { // what if it is not json?
           try {
             if (!data.id) {
               Util.ui.snackbar({alive: 4000, content: 'Oh,Snap! 查看的文章不存在'})

@@ -238,8 +238,8 @@
 </template>
 <script>
   import TopProgress from 'vue-top-progress'
-  import Util from '../../common/libs/util'
-  import Config from '../../common/config/config'
+  import ApiMap from './api_map'
+  import Util from '../../common/libs/utils/util'
 
   export default {
     data () {
@@ -250,7 +250,7 @@
     },
     created () {
       let self = this
-      $.get(Config.ajaxDomain + '/settings', function (data) {
+      $.get(ApiMap.app.settings, function (data) {
         self.settings = data.settings
         self.categories = data.categories
         self.settings.is_auth = data.is_auth
@@ -258,13 +258,6 @@
           self.settings.user = data.user
         }
       })
-    },
-    methods: {
-      openGithub () {
-        let url = this.settings.auth_sites.github.url + this.settings.auth_sites.github.client_id
-        window.open(url, '', 'location=no,status=no')
-        $('#auth_model').modal('hide')
-      }
     },
     mounted () {
       let self = this
@@ -278,6 +271,13 @@
           }
         }
       })
+    },
+    methods: {
+      openGithub () {
+        let url = this.settings.auth_sites.github.url + this.settings.auth_sites.github.client_id
+        window.open(url, '', 'location=no,status=no')
+        $('#auth_model').modal('hide')
+      }
     },
     beforeDestroy () {
 
