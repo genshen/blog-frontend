@@ -6,7 +6,7 @@ import Vue from 'vue'
 import Util from '../../../common/libs/utils/util'
 import SignIn from './sign_in.vue'
 
-import '../../../sass/base.scss'  // material design style
+import '@/sass/base.scss' // material design style
 
 Vue.config.productionTip = false
 

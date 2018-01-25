@@ -75,9 +75,7 @@ util.network = {
           onFinish(code)
         }
       }
-      try { // cookie may be null or something else bad data
-        xsrf = util.tools.base64_decode(Cookies.get('_xsrf').split('|')[0])
-      } catch (err) {
+      if (!(xsrf = util.tools.loadXSRFCookie())) {
         onError()
         finish(0)
         return
@@ -192,6 +190,13 @@ util.tools = {
 
     dec = tmpArr.join('')
     return decodeURIComponent(escape(dec.replace(/\0+$/, '')))
+  },
+  loadXSRFCookie () {
+    try { // cookie may be null or something else bad data
+      return util.tools.base64_decode(Cookies.get('_xsrf').split('|')[0])
+    } catch (err) {
+      return ''
+    }
   },
   formatTime (value) {
     if (typeof value !== 'number') {

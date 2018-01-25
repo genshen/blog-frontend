@@ -131,7 +131,7 @@
             </div>
             <div class="clearfix"></div>
             <div id="comment-flag" style="height:8px"></div>
-            <div v-for="(comment,comment_index) in comments" :class="{'comments-border':comment_index != 0}"
+            <div v-for="(comment,comment_index) in comments" v-bind:key="comment_index" :class="{'comments-border':comment_index != 0}"
                  class="col-md-12 comment-item">
               <div class="comment-mate">
                 <span class="avatar inline-avatar">
@@ -153,7 +153,7 @@
                 {{comment.content}}
               </div>
               <div class="reply-area row">
-                <div v-for="(reply,reply_index) in comment.replies" class="clo-md-12 reply-item">
+                <div v-for="(reply,reply_index) in comment.replies" v-bind:key="reply_index" class="clo-md-12 reply-item">
                   <div class="comment-mate">
                     <span class="avatar inline-avatar">
                       <a :href="reply.user.url" target="_blank">
@@ -230,211 +230,210 @@
   </div>
 </template>
 <script>
-  import Markdown from '../../../common/components/markdown'
-  import ApiMap from '../api_map'
-  import Util from '../../../common/libs/utils/util'
-  import Config from '../../../common/config/config'
+import Markdown from '../../../common/components/markdown'
+import ApiMap from '../api_map'
+import Util from '../../../common/libs/utils/util'
+import Config from '../../../common/config/config'
 
-  export default {
-    props: ['settings'],
-    data: function () {
-      return {
-        article: {
-          id: '',
-          title: '',
-          content: '',
-          summary: '',
-          cover: '',
-          view_count: 0,
-          comment_count: 0,
-          reply_count: 0,
-          created_at: '',
-          updated_at: ''
-        },
-        comments: [],
-        comments_loaded_count: 0,
-        comment_load_status: -1, // 0 for loading(init),1 for loading, 2 for loaded(has more),
-        // 3 for loaded(no more),4 for failed to load(init),5 for failed to load
-        comment_text: ''
+export default {
+  props: ['settings'],
+  data: function () {
+    return {
+      article: {
+        id: '',
+        title: '',
+        content: '',
+        summary: '',
+        cover: '',
+        view_count: 0,
+        comment_count: 0,
+        reply_count: 0,
+        created_at: '',
+        updated_at: ''
+      },
+      comments: [],
+      comments_loaded_count: 0,
+      comment_load_status: -1, // 0 for loading(init),1 for loading, 2 for loaded(has more),
+      // 3 for loaded(no more),4 for failed to load(init),5 for failed to load
+      comment_text: ''
+    }
+  },
+  components: {
+    Markdown
+  },
+  methods: {
+    setCommentLoad () {
+      if (document.getElementById('comment-flag').offsetTop < document.documentElement.clientHeight) {
+        this.loadComment()
+      } else {
+        let self = this
+        $(window).scroll(function () {
+          if (document.getElementById('comment-flag').offsetTop - document.body.scrollTop <
+            document.documentElement.clientHeight) {
+            $(window).unbind('scroll')
+            self.loadComment()
+          }
+        })
       }
     },
-    components: {
-      Markdown
-    },
-    methods: {
-      setCommentLoad () {
-        if (document.getElementById('comment-flag').offsetTop < document.documentElement.clientHeight) {
-          this.loadComment()
-        } else {
-          let self = this
-          $(window).scroll(function () {
-            if (document.getElementById('comment-flag').offsetTop - document.body.scrollTop <
-              document.documentElement.clientHeight) {
-              $(window).unbind('scroll')
-              self.loadComment()
-            }
-          })
-        }
-      },
-      loadComment () {
-        if (this.comment_load_status === 0 || this.comment_load_status === 1) {
-          return
-        }
-        let start = this.comments_loaded_count
-        this.comment_load_status = start === 0 ? 0 : 1
-        let self = this
-        $.ajax({
-          url: ApiMap.detail.comments(this.$route.params.id, start),
-          success: function (data) {
-            try {
-              data.forEach(function (e) {
-                if (!self.containsComment(e.id)) {
-                  e.show_reply_box = false
-                  e.new_reply_content = ''
-                  self.comments.unshift(e)
-                }
-              })
-              self.comments_loaded_count += data.length
-              self.comment_load_status = data.length === Config.blog.maxCommentLength ? 2 : 3 // 2(has more) or 3(not more)
-            } catch (err) {
-              self.comment_load_status = start === 0 ? 4 : 5
-            }
-          },
-          error: function () {
-            self.comment_load_status = start === 0 ? 4 : 5 // 4 or 5
-          }
-        })
-      },
-      containsComment: function (id) {
-        let h = this.comments.length - 1
-        let l = 0
-        while (l <= h) {
-          let m = Math.floor((h + l) / 2)
-          if (this.comments[m].id === id) {
-            return true
-          }
-          if (id > this.comments[m].id) {
-            l = m + 1
-          } else {
-            h = m - 1
-          }
-        }
-        return false
-      },
-      submitComment: function () {
-        if (this.comment_text === '') {
-          Util.ui.snackbar({alive: 3000, content: '评论内容不能为空'})
-          return
-        }
-        if (!this.settings.is_auth) {
-          $('#auth_model').modal('show')
-          return
-        }
-
-        let self = this
-        Util.network.postData.init(ApiMap.detail.commentAdd, {  // todo
-          post_id: this.article.id, content: this.comment_text
-        }, null, function (data) {
-          self.comments.unshift({
-            content: self.comment_text,
-            create_at: (new Date()).getTime(),
-            id: data.Addition,
-            replies: [],
-            status: 1,
-            user: self.settings.user,
-            show_reply_box: false,
-            new_reply_content: ''
-          })
-          self.comment_text = ''
-          Util.ui.snackbar({content: '评论成功', alive: 3000})
-        }, function () {
-          Util.ui.snackbar({alive: 3000, content: Util.messages.NoAuthCommentSnackBar})
-        })
-      },
-      submitReply: function (commentIndex) {
-        let commentSelf = this.comments[commentIndex]
-        if (commentSelf.new_reply_content === '') {
-          Util.ui.snackbar({alive: 3000, content: '回复内容不能为空'})
-          return
-        }
-        if (!this.settings.is_auth) {
-          $('#auth_model').modal('show')
-          return
-        }
-
-        let self = this
-        Util.network.postData.init(ApiMap.detail.replyAdd, {
-          comment_id: commentSelf.id, content: commentSelf.new_reply_content
-        }, null, function (data) {
-          try {
-            commentSelf.replies.push({
-              content: commentSelf.new_reply_content,
-              create_at: (new Date()).getTime(),
-              // todo (new Date()).getTime() => 1502112870976. it is not like this:[2017-08-07T21:25:50.248+08:00], used for DOM element title value
-              id: data.Addition,
-              status: 1,
-              user: self.settings.user
-            })
-            commentSelf.new_reply_content = ''
-            commentSelf.show_reply_box = false
-            Util.ui.snackbar({alive: 3000, content: '回复成功'})
-          } catch (e) {
-            Util.ui.snackbar({alive: 3000, content: '出了点错误,请重试'})
-          }
-        }, function () {
-          Util.ui.snackbar({alive: 3000, content: Util.messages.NoAuthReplySnackBar})
-        })
-      },
-      cancelReply: function (commentIndex) {
-        this.comments[commentIndex].show_reply_box = false
-      },
-      toggleReplyBox: function (commentIndex, replyIndex) { // -1 ->is comment
-        let atOne
-        if (replyIndex < 0) {
-          atOne = this.comments[commentIndex].user.name
-        } else {
-          atOne = this.comments[commentIndex].replies[replyIndex].user.name
-        }
-        this.comments[commentIndex].show_reply_box = true
-        this.comments[commentIndex].new_reply_content = '@' + atOne
-        // console.log($("#reply-box-"+commentIndex));
-        setTimeout(function () {
-          let box = $('#reply-box-' + commentIndex)
-          box.trigger('change')
-          box.trigger('focus')
-        }, 200)
+    loadComment () {
+      if (this.comment_load_status === 0 || this.comment_load_status === 1) {
+        return
       }
-    },
-//    beforeCreate () {
-//      Marked.setOptions({
-//        highlight: function (code) {
-//          return hljs.highlightAuto(code).value
-//        }
-//      })
-//    },
-    mounted: function () {
+      let start = this.comments_loaded_count
+      this.comment_load_status = start === 0 ? 0 : 1
       let self = this
       $.ajax({
-        url: ApiMap.detail.content(this.$route.params.id),
-        success: function (data) { // what if it is not json?
+        url: ApiMap.detail.comments(this.$route.params.id, start),
+        success: function (data) {
           try {
-            if (!data.id) {
-              Util.ui.snackbar({alive: 4000, content: 'Oh,Snap! 查看的文章不存在'})
-              return
-            }
-            if (!data.cover) {
-              data.cover = '/static/assets/img/brand.jpg' // todo image name
-            }
-            self.article = data
+            data.forEach(function (e) {
+              if (!self.containsComment(e.id)) {
+                e.show_reply_box = false
+                e.new_reply_content = ''
+                self.comments.unshift(e)
+              }
+            })
+            self.comments_loaded_count += data.length
+            self.comment_load_status = data.length === Config.blog.maxCommentLength ? 2 : 3 // 2(has more) or 3(not more)
           } catch (err) {
-            Util.ui.snackbar({alive: 3000, content: Util.messages.NormalErrorSnackBar})
+            self.comment_load_status = start === 0 ? 4 : 5
           }
         },
         error: function () {
-          Util.ui.snackbar({alive: 3000, content: Util.messages.NormalErrorSnackBar})
+          self.comment_load_status = start === 0 ? 4 : 5 // 4 or 5
         }
       })
-      setTimeout(this.setCommentLoad, 100)
+    },
+    containsComment: function (id) {
+      let h = this.comments.length - 1
+      let l = 0
+      while (l <= h) {
+        let m = Math.floor((h + l) / 2)
+        if (this.comments[m].id === id) {
+          return true
+        }
+        if (id > this.comments[m].id) {
+          l = m + 1
+        } else {
+          h = m - 1
+        }
+      }
+      return false
+    },
+    submitComment: function () {
+      if (this.comment_text === '') {
+        Util.ui.snackbar({alive: 3000, content: '评论内容不能为空'})
+        return
+      }
+      if (!this.settings.is_auth) {
+        $('#auth_model').modal('show')
+        return
+      }
+
+      let self = this
+      Util.network.postData.init(ApiMap.detail.commentAdd, { // todo
+        post_id: this.article.id, content: this.comment_text
+      }, null, function (data) {
+        self.comments.unshift({
+          content: self.comment_text,
+          create_at: (new Date()).getTime(),
+          id: data.Addition,
+          replies: [],
+          status: 1,
+          user: self.settings.user,
+          show_reply_box: false,
+          new_reply_content: ''
+        })
+        self.comment_text = ''
+        Util.ui.snackbar({content: '评论成功', alive: 3000})
+      }, function () {
+        Util.ui.snackbar({alive: 3000, content: Util.messages.NoAuthCommentSnackBar})
+      })
+    },
+    submitReply: function (commentIndex) {
+      let commentSelf = this.comments[commentIndex]
+      if (commentSelf.new_reply_content === '') {
+        Util.ui.snackbar({alive: 3000, content: '回复内容不能为空'})
+        return
+      }
+      if (!this.settings.is_auth) {
+        $('#auth_model').modal('show')
+        return
+      }
+      let self = this
+      Util.network.postData.init(ApiMap.detail.replyAdd, {
+        comment_id: commentSelf.id, content: commentSelf.new_reply_content
+      }, null, function (data) {
+        try {
+          commentSelf.replies.push({
+            content: commentSelf.new_reply_content,
+            create_at: (new Date()).getTime(),
+            // todo (new Date()).getTime() => 1502112870976. it is not like this:[2017-08-07T21:25:50.248+08:00], used for DOM element title value
+            id: data.Addition,
+            status: 1,
+            user: self.settings.user
+          })
+          commentSelf.new_reply_content = ''
+          commentSelf.show_reply_box = false
+          Util.ui.snackbar({alive: 3000, content: '回复成功'})
+        } catch (e) {
+          Util.ui.snackbar({alive: 3000, content: '出了点错误,请重试'})
+        }
+      }, function () {
+        Util.ui.snackbar({alive: 3000, content: Util.messages.NoAuthReplySnackBar})
+      })
+    },
+    cancelReply: function (commentIndex) {
+      this.comments[commentIndex].show_reply_box = false
+    },
+    toggleReplyBox: function (commentIndex, replyIndex) { // -1 ->is comment
+      let atOne
+      if (replyIndex < 0) {
+        atOne = this.comments[commentIndex].user.name
+      } else {
+        atOne = this.comments[commentIndex].replies[replyIndex].user.name
+      }
+      this.comments[commentIndex].show_reply_box = true
+      this.comments[commentIndex].new_reply_content = '@' + atOne
+      // console.log($("#reply-box-"+commentIndex));
+      setTimeout(function () {
+        let box = $('#reply-box-' + commentIndex)
+        box.trigger('change')
+        box.trigger('focus')
+      }, 200)
     }
+  },
+  //  beforeCreate () {
+  //      Marked.setOptions({
+  //        highlight: function (code) {
+  //          return hljs.highlightAuto(code).value
+  //        }
+  //      })
+  //    },
+  mounted: function () {
+    let self = this
+    $.ajax({
+      url: ApiMap.detail.content(this.$route.params.id),
+      success: function (data) { // what if it is not json?
+        try {
+          if (!data.id) {
+            Util.ui.snackbar({alive: 4000, content: 'Oh,Snap! 查看的文章不存在'})
+            return
+          }
+          if (!data.cover) {
+            data.cover = '/static/assets/img/brand.jpg' // todo image name
+          }
+          self.article = data
+        } catch (err) {
+          Util.ui.snackbar({alive: 3000, content: Util.messages.NormalErrorSnackBar})
+        }
+      },
+      error: function () {
+        Util.ui.snackbar({alive: 3000, content: Util.messages.NormalErrorSnackBar})
+      }
+    })
+    setTimeout(this.setCommentLoad, 100)
   }
+}
 </script>

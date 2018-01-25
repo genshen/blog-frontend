@@ -4,7 +4,7 @@
 <template>
   <div class="container page-lists">
     <div class="row">
-      <div v-for="blog in lists" class="col-md-12 col-lg-10 col-lg-push-1">
+      <div v-for="blog in lists"  v-bind:key="blog.id" class="col-md-12 col-lg-10 col-lg-push-1">
         <div class="card">
           <div class="card-main">
             <div class="card-header">
@@ -37,55 +37,54 @@
   </div>
 </template>
 <script>
-  import ApiMap from '../api_map'
-  import Util from '../../../common/libs/utils/util'
+import ApiMap from '../api_map'
+import Util from '../../../common/libs/utils/util'
 
-  export default {
-    data: function () {
-      return {
-        lists: []
-      }
-    },
-    methods: {
-      handleStart () {
-        this.$Modal.info({
-          title: 'Bravo',
-          content: 'Now, enjoy the convenience of iView.'
-        })
-      }
-    },
-    mounted () {
-
-    },
-    created: function () {
-      this.$parent.$refs.topProgress.start()
-      let self = this
-      $.ajax({
-        url: ApiMap.list.category, // todo different category
-        success: function (data) { // if it is not json?
-          try {
-            self.$parent.$refs.topProgress.done()
-            data.forEach(function (e) {
-              if (!e.cover) {
-                e.cover = '/static/assets/imgs/brand.jpg'
-              }
-              self.lists.push(e)
-            })
-          } catch (err) {
-            self.$parent.$refs.topProgress.fail()
-            Util.ui.snackbar({alive: 3000, content: Util.messages.NormalErrorSnackBar})
-          }
-        },
-        error: function () {
-          self.$parent.$refs.topProgress.fail()
+export default {
+  data: function () {
+    return {
+      lists: []
+    }
+  },
+  methods: {
+    handleStart () {
+      this.$Modal.info({
+        title: 'Bravo',
+        content: 'Now, enjoy the convenience of iView.'
+      })
+    }
+  },
+  mounted () {
+  },
+  created: function () {
+    // this.$parent.$refs.topProgress.start()
+    let self = this
+    $.ajax({
+      url: ApiMap.list.category, // todo different category
+      success: function (data) { // if it is not json?
+        try {
+          // self.$parent.$refs.topProgress.done()
+          data.forEach(function (e) {
+            if (!e.cover) {
+              e.cover = '/static/assets/imgs/brand.jpg'
+            }
+            self.lists.push(e)
+          })
+        } catch (err) {
+          // self.$parent.$refs.topProgress.fail()
           Util.ui.snackbar({alive: 3000, content: Util.messages.NormalErrorSnackBar})
         }
-      })
-    },
-    route: {
-      data: function () {
-        window.console.log('data!@')
+      },
+      error: function () {
+        // self.$parent.$refs.topProgress.fail()
+        Util.ui.snackbar({alive: 3000, content: Util.messages.NormalErrorSnackBar})
       }
+    })
+  },
+  route: {
+    data: function () {
+      window.console.log('data!@')
     }
   }
+}
 </script>

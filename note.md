@@ -4,6 +4,6 @@ at assets/sass:
 2. modify: /addons/material-icons/_variables.scss $mdicon-path //todo
 3. /var/_variables 更改全局字体为 "Microsoft Yahei"
 
-
+//todo 修改相对路径为全局的@路径
 note:
 修改github localhost

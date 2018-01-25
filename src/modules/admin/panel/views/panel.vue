@@ -66,10 +66,10 @@
 </template>
 
 <script>
-  export default {
-    methods: {},
-    ready: function () {
-      console.log('Home Ready.')
-    }
+export default {
+  methods: {},
+  ready: function () {
+    console.log('Home Ready.')
   }
+}
 </script>

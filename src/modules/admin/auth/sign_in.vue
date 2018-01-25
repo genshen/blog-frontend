@@ -109,36 +109,36 @@
 </template>
 
 <script>
-  import TopProgress from 'vue-top-progress'
-  import UrlMap from './sign_in_url_map'
-  import Util from '../../../common/libs/utils/util'
+import TopProgress from 'vue-top-progress'
+import UrlMap from './sign_in_url_map'
+import Util from '@/common/libs/utils/util'
 
-  export default {
-    data () {
-      return {
-        email: '',
-        password: ''
-      }
-    },
-    methods: {
-      onSubmit: function () {
-        if (!this.email) {
-          $('body').snackbar({alive: 3500, content: '邮箱不能为空'})
-        } else if (!this.password) {
-          $('body').snackbar({alive: 3500, content: '密码不能为空'})
-        } else {
-          //  Util.network.postData.config.authUrl = location.pathname
-          Util.network.postData.init(UrlMap.auth_url, {
-            email: this.email,
-            password: this.password
-          }, null, function (data) {
-            window.location.replace(data.Addition)
-          })
-        } // else end
-      }
-    },
-    components: {
-      TopProgress
+export default {
+  data () {
+    return {
+      email: '',
+      password: ''
     }
+  },
+  methods: {
+    onSubmit: function () {
+      if (!this.email) {
+        $('body').snackbar({alive: 3500, content: '邮箱不能为空'})
+      } else if (!this.password) {
+        $('body').snackbar({alive: 3500, content: '密码不能为空'})
+      } else {
+        //  Util.network.postData.config.authUrl = location.pathname
+        Util.network.postData.init(UrlMap.auth_url, {
+          email: this.email,
+          password: this.password
+        }, null, function (data) {
+          window.location.replace(data.Addition)
+        })
+      } // else end
+    }
+  },
+  components: {
+    TopProgress
   }
+}
 </script>

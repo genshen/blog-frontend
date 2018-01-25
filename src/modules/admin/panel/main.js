@@ -4,7 +4,7 @@ import Vue from 'vue'
 import Routers from './router'
 import App from './app.vue'
 
-import '../../../sass/base.scss'  // material design style
+import '@/sass/base.scss' // material design style
 
 Vue.config.productionTip = false
 

@@ -1,4 +1,4 @@
-import Config from '../../common/config/config'
+import Config from '@/common/config/config'
 
 const API_PREFIX = Config.ajaxDomain + Config.apiPrefix
 const map = {

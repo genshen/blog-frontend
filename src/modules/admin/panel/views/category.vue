@@ -44,7 +44,7 @@
             <div class="form-group form-group-label">
               <label for="category-select">父级分类</label>
               <select v-model="new_sub_category_type" id="category-select">
-                <option v-for="(category,index) in categories" :value="index">
+                <option v-for="(category,index) in categories" v-bind:key="category.id" :value="index">
                   {{category.name}}
                 </option>
               </select>
@@ -98,8 +98,8 @@
                       </tr>
                       </thead>
                       <tbody>
-                      <template v-for="(category,index) in categories">
-                        <tr class="settings-category-ink-tr">
+                      <template v-for="category in categories">
+                        <tr class="settings-category-ink-tr" v-bind:key="category.id">
                           <td><b>{{category.name}}</b></td>
                           <td><b>{{category.slug}}</b></td>
                           <td></td>
@@ -107,7 +107,7 @@
                           <td></td>
                           <td><a href="javascript:void(0)">删除父级分类</a></td>
                         </tr>
-                        <tr v-for="sub in category.sub_category">
+                        <tr v-for="sub in category.sub_category" v-bind:key="sub.id">
                           <td></td>
                           <td></td>
                           <td>{{sub.name}}</td>
@@ -139,87 +139,84 @@
 </template>
 
 <script>
-  import Util from '../../../../common/libs/utils/util'
-  import LocalUtils from '../utils/utils'
-  import ApiMap from '../utils/api_map'
-
-  export default {
-    data: function () {
-      return {
-        categories: [],
-        new_category_name: '',
-        new_category_slug: '',
-        new_category_submitting: false,
-        new_sub_category_type: 0,
-        new_sub_category_name: '',
-        new_sub_category_slug: '',
-        new_sub_category_submitting: false
-      }
-    },
-    methods: {
-      addCategory: function () {
-        if (!this.new_category_submitting) {
-          if (this.new_category_name === '' || this.new_category_slug === '') {
-            $('body').snackbar({alive: 3000, content: '请填写完相关项后再提交'})
-            return
-          }
-          this.new_category_submitting = true
-          let self = this
-
-          Util.network.postData.init(ApiMap.category.add, {
-            name: this.new_category_name,
-            slug: this.new_category_slug
-          },
-          null, function (data) {
-            self.categories.push({
-              id: data.Addition,
-              name: self.new_category_name,
-              slug: self.new_category_name,
-              sub_category: []
-            })
-            self.new_category_name = ''
-            self.new_category_name = ''
-            $('#category-edit-modal').modal('hide')
-            $('body').snackbar({alive: 3000, content: '分类添加成功'})
-          }, null, null, null, function () {
-            self.new_category_submitting = false
-          })
-        }
-      },
-      addSubCategory: function () {
-        // console.log(this.new_sub_category_type);
-        if (this.new_sub_category_name === '' || this.new_sub_category_slug === '') {
+import Util from '../../../../common/libs/utils/util'
+import LocalUtils from '../utils/utils'
+import ApiMap from '../utils/api_map'
+export default {
+  data: function () {
+    return {
+      categories: [],
+      new_category_name: '',
+      new_category_slug: '',
+      new_category_submitting: false,
+      new_sub_category_type: 0,
+      new_sub_category_name: '',
+      new_sub_category_slug: '',
+      new_sub_category_submitting: false
+    }
+  },
+  methods: {
+    addCategory: function () {
+      if (!this.new_category_submitting) {
+        if (this.new_category_name === '' || this.new_category_slug === '') {
           $('body').snackbar({alive: 3000, content: '请填写完相关项后再提交'})
           return
         }
-        let index = this.new_sub_category_type
-        let _id = this.categories[index].id
-        this.new_sub_category_submitting = true
+        this.new_category_submitting = true
         let self = this
-
-        Util.network.postData.init(ApiMap.category.sub_add, {
-          id: _id,
-          name: this.new_sub_category_name,
-          slug: this.new_sub_category_slug
+        Util.network.postData.init(ApiMap.category.add, {
+          name: this.new_category_name,
+          slug: this.new_category_slug
         },
         null, function (data) {
-          self.categories[index].sub_category.push({
+          self.categories.push({
             id: data.Addition,
-            name: self.new_sub_category_name,
-            slug: self.new_sub_category_slug,
-            posts_count: 0
+            name: self.new_category_name,
+            slug: self.new_category_name,
+            sub_category: []
           })
-          self.new_sub_category_name = ''
-          self.new_sub_category_slug = ''
-          $('#sub-category-edit-modal').modal('hide')
-          $('body').snackbar({alive: 3000, content: '子分类添加成功'})
+          self.new_category_name = ''
+          self.new_category_name = ''
+          $('#category-edit-modal').modal('hide')
+          $('body').snackbar({alive: 3000, content: '分类添加成功'})
         }, null, null, null, function () {
-          self.new_sub_category_submitting = false
+          self.new_category_submitting = false
         })
       }
     },
-    created: function () {
-      LocalUtils.loadCategories(this, this.categories)
+    addSubCategory: function () {
+      // console.log(this.new_sub_category_type);
+      if (this.new_sub_category_name === '' || this.new_sub_category_slug === '') {
+        $('body').snackbar({alive: 3000, content: '请填写完相关项后再提交'})
+        return
+      }
+      let index = this.new_sub_category_type
+      let _id = this.categories[index].id
+      this.new_sub_category_submitting = true
+      let self = this
+      Util.network.postData.init(ApiMap.category.sub_add, {
+        id: _id,
+        name: this.new_sub_category_name,
+        slug: this.new_sub_category_slug
+      },
+      null, function (data) {
+        self.categories[index].sub_category.push({
+          id: data.Addition,
+          name: self.new_sub_category_name,
+          slug: self.new_sub_category_slug,
+          posts_count: 0
+        })
+        self.new_sub_category_name = ''
+        self.new_sub_category_slug = ''
+        $('#sub-category-edit-modal').modal('hide')
+        $('body').snackbar({alive: 3000, content: '子分类添加成功'})
+      }, null, null, null, function () {
+        self.new_sub_category_submitting = false
+      })
     }
+  },
+  created: function () {
+    LocalUtils.loadCategories(this, this.categories)
   }
+}
 </script>

@@ -77,13 +77,13 @@
                 Profile Settings
                 <span class="menu-collapse-toggle collapsed waves-attach waves-effect"
                       data-target="#ui_menu_profile_settings" data-toggle="collapse">
-								<div class="menu-collapse-toggle-close">
-									<i class="icon icon-lg">close</i>
-								</div>
-								<div class="menu-collapse-toggle-default">
-									<i class="icon icon-lg">add</i>
-								</div>
-							</span>
+                  <div class="menu-collapse-toggle-close">
+                    <i class="icon icon-lg">close</i>
+                  </div>
+                  <div class="menu-collapse-toggle-default">
+                    <i class="icon icon-lg">add</i>
+                  </div>
+                </span>
               </a>
               <ul class="menu-collapse collapse" id="ui_menu_profile_settings">
                 <li>
@@ -122,5 +122,5 @@
 </template>
 
 <script>
-  export default {}
+export default {}
 </script>

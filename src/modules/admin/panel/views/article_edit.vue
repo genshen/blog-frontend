@@ -7,8 +7,8 @@
             <p class="modal-title">上传图片</p>
           </div>
           <div class="modal-inner">
-            <ImageUpload v-if="imageUploadComponentStatus" @on-success="onImageUploadSuccess"
-                         @on-fail="onImageUploadFail" :option="upload_config"></ImageUpload>
+            <ImageUpload v-if="imageUploadComponentStatus" @on-success="onImageUploadSuccess" @on-fail="onImageUploadFail"
+                         :upload_path="upload_config.upload_path" :data="upload_config.data"></ImageUpload>
           </div>
           <div class="modal-footer">
             <p class="text-right">
@@ -44,11 +44,11 @@
                 <label for="article_edit_category">分类</label>
                 <select v-model="field_category_id" id="article_edit_category" type="text">
                   <option value="0">请选择主分类</option>
-                  <option v-for="category in categories" :value="category.id">{{category.name}}</option>
+                  <option v-for="category in categories"  v-bind:key="category.id" :value="category.id">{{category.name}}</option>
                 </select>
                 <select v-model="field_sub_category_id" id="article_edit_sun_category" type="text">
                   <option value="0">请选择子分类</option>
-                  <option v-for="category in sub_category_set" :value="category.id">{{category.name}}</option>
+                  <option v-for="category in sub_category_set" v-bind:key="category.id" :value="category.id">{{category.name}}</option>
                 </select>
               </div>
               <div class="form-group form-group-label">
@@ -90,97 +90,105 @@
 </template>
 
 <script>
-  import Markdown from '../../../../common/components/markdown'
-  import ImageUpload from '../../../../common/components/image-upload'
-  import LocalUtils from '../utils/utils'
-  import ApiMap from '../utils/api_map'
-  import Util from '../../../../common/libs/utils/util'
-
-  export default {
-    data: function () {
-      return {
-        categories: [],
-        image_file_domain: '',
-        upload_config: {upload_path: '', custom_upload: false, data: {token: ''}},
-        imageUploadComponentStatus: false,
-//        images: [], // {src:"blobUrl",status:0,file:fileObject}  //status:-1上传失败,0等待上传,1正在上传,2上传完成
-        article_title: '',
-        field_category_id: 0,
-        field_sub_category_id: 0,
-        article_content: ''
-      }
-    },
-    components: {
-      Markdown,
-      ImageUpload
-    },
-    methods: {
-      getUploadToken: function () {
-        $.ajax({
-          url: ApiMap.common.upload_token,
-          context: this,
-          success: function (data) {
-            this.image_file_domain = data.domain
-            this.upload_config.upload_path = data.upload_path
-            this.upload_config.data.token = data.token // todo v-if
-            this.imageUploadComponentStatus = true
-          },
-          error: function (req, err) {
-            $('body').snackbar({alive: 3000, content: '加载上传配置信息出错了'})
-          }
-        })
-      },
-      onImageUploadSuccess (image, data) {
-        try {
-          this.article_content += '![image](' + this.image_file_domain + data.key + ')\r\n'  // qiniu file upload.
-          image.status = 2
-        } catch (e) {
-          image.status = -1
-          this.onImageUploadFail(image, e)
-        }
-      },
-      onImageUploadFail (image, err) {
-        $('body').snackbar({alive: 3000, content: '上传出错了'})
-      },
-      submit () {
-        if (!this.article_title) {
-          $('body').snackbar({content: '标题不能为空', alive: 4000})
-          return
-        } else if (!this.article_content) {
-          $('body').snackbar({content: '内容不能为空', alive: 4000})
-          return
-        }
-        let self = this
-        Util.network.postData.init(ApiMap.article.publish, {  // todo category_id
-          category_id: this.field_category_id,
-          sub_category_id: this.field_category_id,
-          title: this.article_title,
-          content: this.article_content,
-          summary: (this.article_content).replace(/<.*?>/ig, '')  // todo Marked
-        }, null, function () {
-          $('body').snackbar({content: '文章发布成功', alive: 4000})
-          self.article_title = ''
-          self.article_content = ''
-        })
-      }
-    },
-    computed: {
-      sub_category_set: function () {
-        if (this.field_category_id) {
-          for (let index in this.categories) {
-            if (this.categories[index].id === this.field_category_id) {
-              this.field_sub_category_id = 0 // reset sub_category_id
-              return this.categories[index].sub_category
+import Markdown from '../../../../common/components/markdown'
+import ImageUpload from '../../../../common/components/image-upload'
+import LocalUtils from '../utils/utils'
+import ApiMap from '../utils/api_map'
+import Util from '../../../../common/libs/utils/util'
+export default {
+  data: function () {
+    return {
+      categories: [],
+      image_file_domain: '',
+      upload_config: {upload_path: '', custom_upload: false, data: {}},
+      imageUploadComponentStatus: false,
+      // images: [], // {src:"blobUrl",status:0,file:fileObject}  //status:-1上传失败,0等待上传,1正在上传,2上传完成
+      article_title: '',
+      field_category_id: 0,
+      field_sub_category_id: 0,
+      article_content: ''
+    }
+  },
+  components: {
+    Markdown,
+    ImageUpload
+  },
+  methods: {
+    getUploadToken: function () {
+      $.ajax({
+        url: ApiMap.common.upload_token,
+        context: this,
+        success: function (data) { // todo error handle
+          this.image_file_domain = data.domain
+          this.upload_config.upload_path = data.upload_path
+          this.upload_config.data.token = data.token // todo v-if
+          this.imageUploadComponentStatus = true
+          if (!this.upload_config.custom_upload) {
+            // add cookie for _xsrf
+            try { // cookie may be null or something else bad data
+              let xsrf = Util.tools.loadXSRFCookie()
+              this.upload_config.data._xsrf = xsrf
+            } catch (err) {
+              $('body').snackbar({alive: 3000, content: '获取上传配置信息出错了'})
             }
           }
+        },
+        error: function (req, err) {
+          $('body').snackbar({alive: 3000, content: '获取上传配置信息出错了'})
         }
-        return []
+      })
+    },
+    onImageUploadSuccess (image, data) {
+      try {
+        this.article_content += '![image](' + this.image_file_domain + data.key + ')\r\n' // qiniu file upload.
+        image.status = 2
+      } catch (e) {
+        image.status = -1
+        this.onImageUploadFail(image, e)
       }
     },
-    created () {
-      LocalUtils.loadCategories(this, this.categories)
-      // get image upload token
-      this.getUploadToken()
+    onImageUploadFail (image, err) { // todo error of session timeout
+      $('body').snackbar({alive: 3000, content: '上传出错了'})
+    },
+    submit () {
+      if (!this.article_title) {
+        $('body').snackbar({content: '标题不能为空', alive: 4000})
+        return
+      } else if (!this.article_content) {
+        $('body').snackbar({content: '内容不能为空', alive: 4000})
+        return
+      }
+      let self = this
+      Util.network.postData.init(ApiMap.article.publish, { // todo category_id
+        category_id: this.field_category_id,
+        sub_category_id: this.field_category_id,
+        title: this.article_title,
+        content: this.article_content,
+        summary: (this.article_content).replace(/<.*?>/ig, '') // todo Marked
+      }, null, function () {
+        $('body').snackbar({content: '文章发布成功', alive: 4000})
+        self.article_title = ''
+        self.article_content = ''
+      })
     }
+  },
+  computed: {
+    sub_category_set: function () {
+      if (this.field_category_id) {
+        for (let index in this.categories) {
+          if (this.categories[index].id === this.field_category_id) {
+            // todo import!! this.field_sub_category_id = 0 // reset sub_category_id
+            return this.categories[index].sub_category
+          }
+        }
+      }
+      return []
+    }
+  },
+  created () {
+    LocalUtils.loadCategories(this, this.categories)
+    // get image upload token
+    this.getUploadToken()
   }
+}
 </script>

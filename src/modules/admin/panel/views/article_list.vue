@@ -3,10 +3,10 @@
 </template>
 
 <script>
-  export default {
-    methods: {},
-    ready: function () {
-      console.log('Article List Ready')
-    }
+export default {
+  methods: {},
+  ready: function () {
+    console.log('Article List Ready')
   }
+}
 </script>
