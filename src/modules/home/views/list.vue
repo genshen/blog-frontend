@@ -3,6 +3,18 @@
 </style>
 <template>
   <div class="container page-lists">
+
+    <v-snackbar
+      :timeout="snackbar_opotion.timeout"
+      :color="snackbar_opotion.color"
+      :multi-line="snackbar_opotion.multi_line"
+      :vertical="snackbar_opotion.vertical"
+      v-model="snackbar_opotion.show"
+    >
+      {{ snackbar_opotion.text }}
+      <v-btn flat color="pink" @click.native="snackbar_opotion.show = false">Close</v-btn>
+    </v-snackbar>
+
     <div class="row">
       <div v-for="blog in lists"  v-bind:key="blog.id" class="col-md-12 col-lg-10 col-lg-push-1">
         <div class="card">
@@ -38,12 +50,21 @@
 </template>
 <script>
 import ApiMap from '../api_map'
-import Util from '../../../common/libs/utils/util'
+import Util from '@/common/libs/utils/util'
+import Net from '@/common/libs/net/net'
 
 export default {
   data: function () {
     return {
-      lists: []
+      lists: [],
+      snackbar_opotion: {
+        show: false,
+        color: '',
+        multi_line: false,
+        vertical: false,
+        timeout: 6000,
+        text: ''
+      }
     }
   },
   methods: {
@@ -52,34 +73,40 @@ export default {
         title: 'Bravo',
         content: 'Now, enjoy the convenience of iView.'
       })
+    },
+    snackbar (text) {
+      this.snackbar_opotion.text = text
+      this.snackbar_opotion.show = true
     }
   },
   mounted () {
   },
   created: function () {
-    // this.$parent.$refs.topProgress.start()
+    this.$Progress.start()
     let self = this
-    $.ajax({
-      url: ApiMap.list.category, // todo different category
-      success: function (data) { // if it is not json?
+    Net.axiosInstance.get(ApiMap.list.category, { // todo different category
+      params: {
+        ID: 12345
+      }
+    })
+      .then(function (response) {
         try {
-          // self.$parent.$refs.topProgress.done()
-          data.forEach(function (e) {
+          self.$Progress.finish()
+          response.forEach(function (e) { // if it is not json?
             if (!e.cover) {
               e.cover = '/static/assets/imgs/brand.jpg'
             }
             self.lists.push(e)
           })
         } catch (err) {
-          // self.$parent.$refs.topProgress.fail()
-          Util.ui.snackbar({alive: 3000, content: Util.messages.NormalErrorSnackBar})
+          self.$Progress.fail()
+          self.snackbar(Util.messages.SnackbarErrorMessage)
         }
-      },
-      error: function () {
-        // self.$parent.$refs.topProgress.fail()
-        Util.ui.snackbar({alive: 3000, content: Util.messages.NormalErrorSnackBar})
-      }
-    })
+      })
+      .catch(function () {
+        self.$Progress.fail()
+        self.snackbar(Util.messages.SnackbarErrorMessage)
+      })
   },
   route: {
     data: function () {

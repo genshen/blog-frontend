@@ -1,6 +1,6 @@
 import Config from '@/common/config/config'
 
-const API_PREFIX = Config.ajaxDomain + Config.apiPrefix
+const API_PREFIX = Config.ajaxDomain + Config.api.blog_api_prefix
 const map = {
   app: {
     settings: Config.ajaxDomain + '/settings'

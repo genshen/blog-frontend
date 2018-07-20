@@ -33,13 +33,13 @@ module.exports = {
     assetsSubDirectory: 'static',
     assetsPublicPath: '/',
     proxyTable: {
-      // '/at': {
-      //   target: 'http://localhost',
-      //   changeOrigin: true,
-      //   pathRewrite: {
-      //     '^/at': '/at'   //api
-      //   }
-      // }
+      '/s/api': {
+        target: 'http://localhost:8090',
+        changeOrigin: true,
+        // pathRewrite: {
+        //   '^/at': '/at'   //api
+        // }
+      }
     },
 
     // Various Dev Server settings

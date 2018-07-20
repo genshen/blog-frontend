@@ -1,8 +1,9 @@
-import Config from '../../../../common/config/config'
+import Config from '@/common/config/config'
 
-const ADMIN_PREFIX = '/admin'
-const ADMIN_API_PREFIX = Config.ajaxDomain + ADMIN_PREFIX + '/api'
-const ADMIN_SIGN_OUT_PATH = Config.ajaxDomain + ADMIN_PREFIX + '/auth/sign_out'
+const ADMIN_API_PREFIX = Config.api.admin_api_prefix
+const ADMIN_PREFIX = Config.pages.admin_prefix
+// const ADMIN_SIGN_IN_PATH = Config.ajaxDomain + ADMIN_PREFIX + '/auth/sign_in'
+const ADMIN_SIGN_OUT_PATH = Config.ajaxDomain + Config.pages.admin_signout_page
 
 /**
  var Config = {

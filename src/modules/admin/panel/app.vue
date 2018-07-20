@@ -1,126 +1,77 @@
 <style scoped>
-  .ui-admin-content {
-    margin-top: 55px;
-    margin-bottom: 92px;
-  }
-
-  .ui-footer {
-    border-top: 1px solid rgba(0, 0, 0, .12);
-    text-align: center;
-    padding-top: 12px;
-    padding-bottom: 12px;
-    position: absolute;
-    bottom: 0;
-    right: 0;
-    left: 0;
-  }
-
-  textarea {
-    resize: none
-  }
-
-  .header-nav-menu i {
-    color: #fff
-  }
 </style>
+
 <template>
-  <div class="page-brand">
-    <header class="header header-brand header-waterfall ui-header">
-      <ul class="nav nav-list pull-left">
-        <li>
-          <a href="javascript:void(0)">
-            <span class="icon icon-lg">menu</span>
-          </a>
-        </li>
-      </ul>
-      <router-link class="header-logo header-affix-hide margin-left-no margin-right-no" data-offset-top="213"
-                   :to="{name:'panel'}" data-spy="affix" href="javascript:void(0)">Panel Home</router-link>
-      <ul class="nav nav-list pull-right">
-        <li class="dropdown header-nav-menu">
-          <a class="btn btn-flat btn-brand waves-attach waves-effect" href="#">
-            <i class="icon icon-lg">face</i>
-          </a>
-        </li>
-        <li>
-          <a data-toggle="menu" href="#ui_menu_profile">
-            <span class="access-hide">John Smith</span>
-            <span class="avatar avatar-sm">
-              <img alt="avatar" src="/assets/img/avatar.jpg">
-            </span>
-          </a>
-        </li>
-      </ul>
-    </header>
-
-    <nav aria-hidden="true" class="menu menu-right" id="ui_menu_profile" tabindex="-1">
-      <div class="menu-scroll">
-        <div class="menu-top">
-          <div class="menu-top-img">
-            <img alt="landscape" src="/assets/img/landscape.jpg">
-          </div>
-          <div class="menu-top-info">
-            <a class="menu-top-user" href="javascript:void(0)">
-              <span class="avatar avatar-inline margin-right">
-                <img alt="avatar" src="/assets/img/avatar.jpg">
-              </span>
-              <span>Admin</span>
-            </a>
-          </div>
-          <div class="menu-top-info-sub">
-            <small>here nothing</small>
-          </div>
-        </div>
-        <div class="menu-content">
-          <ul class="nav">
-            <li>
-              <a class="waves-attach waves-effect" href="javascript:void(0)">
-                Profile Settings
-                <span class="menu-collapse-toggle collapsed waves-attach waves-effect"
-                      data-target="#ui_menu_profile_settings" data-toggle="collapse">
-                  <div class="menu-collapse-toggle-close">
-                    <i class="icon icon-lg">close</i>
-                  </div>
-                  <div class="menu-collapse-toggle-default">
-                    <i class="icon icon-lg">add</i>
-                  </div>
-                </span>
-              </a>
-              <ul class="menu-collapse collapse" id="ui_menu_profile_settings">
-                <li>
-                  <a class="waves-attach waves-effect" href="javascript:void(0)">First Item</a>
-                </li>
-                <li>
-                  <a class="waves-attach waves-effect" href="javascript:void(0)">Another Item</a>
-                </li>
-                <li>
-                  <a class="waves-attach waves-effect" href="javascript:void(0)">Something Else</a>
-                </li>
-              </ul>
-            </li>
-            <li>
-              <a class="waves-attach waves-effect" href="javascript:void(0)">Upload Photo</a>
-            </li>
-            <li>
-              <a class="waves-attach waves-effect" href="/admin/auth/signout">signout</a>
-            </li>
-          </ul>
-        </div>
-      </div>
-    </nav>
-
-    <main class="ui-admin-content">
+  <v-app id="inspire">
+    <v-navigation-drawer v-model="drawer" temporary app  class="grey lighten-4">
+      <v-list dense>
+        <template v-for="(item, i) in items">
+          <v-layout
+            v-if="item.heading" :key="i" row align-center>
+            <v-flex xs6>
+              <v-subheader v-if="item.heading">
+                {{ item.heading }}
+              </v-subheader>
+            </v-flex>
+            <v-flex xs6 class="text-xs-right">
+              <v-btn small flat>edit</v-btn>
+            </v-flex>
+          </v-layout>
+          <v-divider v-else-if="item.divider" :key="i" dark class="my-3"></v-divider>
+          <v-list-tile v-else :key="i"  @click="gotoList">
+            <v-list-tile-action>
+              <v-icon>{{ item.icon }}</v-icon>
+            </v-list-tile-action>
+            <v-list-tile-content>
+              <v-list-tile-title class="grey--text">
+                {{ item.text }}
+              </v-list-tile-title>
+            </v-list-tile-content>
+          </v-list-tile>
+        </template>
+      </v-list>
+    </v-navigation-drawer>
+    <v-toolbar light fixed app>
+      <v-toolbar-side-icon @click.stop="drawer = !drawer"></v-toolbar-side-icon>
+      <v-toolbar-title>Panel</v-toolbar-title>
+    </v-toolbar>
+    <v-content>
       <router-view></router-view>
-    </main>
-    <footer class="footer ui-footer">
-      <div class="container">
-        <p>Material</p>
-      </div>
-    </footer>
-
-  </div>
-
+    </v-content>
+    <v-footer color="white" app>
+      <span class="white--text">&copy; 2018</span>
+    </v-footer>
+  </v-app>
 </template>
 
 <script>
-export default {}
+export default {
+  data: () => ({
+    drawer: null,
+    items: [
+      { icon: 'lightbulb_outline', text: 'Notes' },
+      { icon: 'touch_app', text: 'Reminders' },
+      { divider: true },
+      { heading: 'Labels' },
+      { icon: 'add', text: 'Create new label' },
+      { divider: true },
+      { icon: 'archive', text: 'Archive' },
+      { icon: 'delete', text: 'Trash' },
+      { divider: true },
+      { icon: 'settings', text: 'Settings' },
+      { icon: 'chat_bubble', text: 'Trash' },
+      { icon: 'help', text: 'Help' },
+      { icon: 'phonelink', text: 'App downloads' },
+      { icon: 'keyboard', text: 'Keyboard shortcuts' }
+    ]
+  }),
+  props: {
+    source: String
+  },
+  methods: {
+    gotoList () {
+      return null
+    }
+  }
+}
 </script>

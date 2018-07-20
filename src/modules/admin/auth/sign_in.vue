@@ -1,144 +1,183 @@
 <style scoped>
+  #login {
+    height: 50%;
+    width: 100%;
+    position: absolute;
+    top: 0;
+    left: 0;
+    content: "";
+    z-index: 0;
+  }
   .ui-footer {
     border-top: 1px solid rgba(0, 0, 0, .12);
     text-align: center;
     margin-top: 6px;
     padding-top: 12px;
     padding-bottom: 12px;
-    position: absolute;
-    bottom: 0;
-    right: 0;
-    left: 0;
   }
-
+  .login-form-container{
+    width: 100%;
+  }
   .ui-content {
     margin-top: 24px;
     margin-bottom: 92px;
   }
 </style>
 <template>
-  <div class="layout page-brand">
-    <top-progress ref="topProgress"></top-progress>
-    <header class="header header-brand  ui-header">
-      <span class="header-logo">Admin</span>
-    </header>
+  <v-app id="login" class="indigo">
+    <!--<progress-bar ref="topProgress"></progress-bar>-->
+    <v-snackbar
+      :timeout="snackbar_opotion.timeout"
+      :color="snackbar_opotion.color"
+      :multi-line="snackbar_opotion.multi_line"
+      :vertical="snackbar_opotion.vertical"
+      v-model="snackbar_opotion.show"
+    >
+      {{ snackbar_opotion.text }}
+      <v-btn flat color="pink" @click.native="snackbar_opotion.show = false">Close</v-btn>
+    </v-snackbar>
 
-    <main id="app" class="ui-content">
+    <v-content>
+      <v-container fluid fill-height>
+        <v-layout align-center justify-center>
+          <v-flex xs12 sm6 md4 lg4>
+            <v-card elevation-2 pa-4>
+              <v-card-title primary-title>
+                <div class="layout column align-center">
+                  <!--<img src="/static/m.png" alt="Vue Material Admin" width="120" height="120">-->
+                  <h1 class="flex my-4 primary--text">Login to Admin</h1>
+                </div>
+              </v-card-title>
+              <v-card-text>
+                <div class="login-form-container">
+                  <v-form ref="form" v-model="form.valid" lazy-validation>
+                    <v-text-field
+                      append-icon="person"
+                      v-model="form.email.value"
+                      :rules="form.email.rules"
+                      name="email"
+                      label="E-mail"
+                      required
+                    ></v-text-field>
+                    <v-text-field
+                      v-model="form.password.value"
+                      :append-icon="form.password.visible ? 'visibility_off' : 'visibility'"
+                      :append-icon-cb="() => (form.password.visible = !form.password.visible)"
+                      :type="form.password.visible ? 'text' : 'password'"
+                      :rules="form.password.rules"
+                      name="password"
+                      label="Enter your password"
+                      hint="At least 6 characters"
+                      min="6"
+                      required
+                      counter
+                    ></v-text-field>
+                  </v-form>
+                </div>
+              </v-card-text>
+              <v-card-actions>
+                <v-btn flat :disabled="!form.valid" :loading="form.loading" @click="onSubmit" color="info">Submit
+                </v-btn>
+                <v-btn flat>Cancel</v-btn>
+              </v-card-actions>
+            </v-card>
+          </v-flex>
+        </v-layout>
+      </v-container>
+    </v-content>
+
+    <v-footer color="light" height="128" inset class="ui-footer footer">
       <div class="container">
         <div class="row">
-          <div class="col-lg-4 col-lg-push-4 col-sm-6 col-sm-push-3">
-            <section>
-              <div class="card">
-                <div class="card-main">
-                  <div class="card-header">
-                    <div class="card-inner">
-                      <h1 class="card-heading">Sign In</h1>
-                    </div>
-                  </div>
-                  <div class="card-inner">
-                    <p class="text-center">
-                      <span class="avatar avatar-inline avatar-lg">
-                        <img alt="Login" src="/static/assets/imgs/avatar.jpg">
-                      </span>
-                    </p>
-                    <div class="form-group form-group-label">
-                      <div class="row">
-                        <div class="col-md-10 col-md-push-1">
-                          <label class="floating-label" for="sign_in_email">Email</label>
-                          <input v-model="email" class="form-control" id="sign_in_email" type="text">
-                        </div>
-                      </div>
-                    </div>
-                    <div class="form-group form-group-label">
-                      <div class="row">
-                        <div class="col-md-10 col-md-push-1">
-                          <label class="floating-label" for="sign_in_password">Password</label>
-                          <input v-model="password" class="form-control" id="sign_in_password"
-                                 type="password">
-                        </div>
-                      </div>
-                    </div>
-                    <div class="form-group">
-                      <div class="row">
-                        <div class="col-md-10 col-md-push-1">
-                          <button @click="onSubmit" class="btn btn-block btn-brand waves-attach">
-                            SignIn
-                          </button>
-                        </div>
-                      </div>
-                    </div>
-                    <div class="form-group">
-                      <div class="row">
-                        <div class="col-md-10 col-md-push-1">
-                          <div class="checkbox checkbox-adv">
-                            <label for="ui_login_remember">
-                              <input class="access-hide" id="ui_login_remember"
-                                     name="ui_login_remember" type="checkbox">Stay signed in
-                              <span class="checkbox-circle"></span>
-                              <span class="checkbox-circle-check"></span>
-                              <span class="checkbox-circle-icon icon">done</span>
-                            </label>
-                          </div>
-                        </div>
-                      </div>
-                    </div>
-                  </div> <!---card-inner-->
-                </div><!---card-main-->
-              </div><!--card-->
-              <div class="clearfix">
-                <p class="margin-no-top pull-left">
-                  <a class="btn btn-flat btn-brand waves-attach" href="javascript:void(0)">Need help?</a>
-                </p>
-                <p class="margin-no-top pull-right">
-                  <a class="btn btn-flat btn-brand waves-attach" href="javascript:void(0)">Create an account</a>
-                </p>
-              </div>
-            </section>
+          <div class="col-sm-12">
+            <p>
+              <a>关于</a>&nbsp;|
+              <a target="_blank">Github</a>
+            </p>
+            <p class="powered">
+              Powered by <a href="https://beego.me/" target="_blank">Beego Framework</a>
+              <span>& UI by </span><a href="https://github.com/vuetifyjs/vuetify" target="_blank">Material of vuetifyjs</a>
+            </p>
           </div>
         </div>
       </div>
-    </main>
-
-    <footer class="footer ui-footer">
-      <div class="container">
-        <p>Material</p>
-      </div>
-    </footer>
-  </div>
+    </v-footer>
+  </v-app>
 
 </template>
 
 <script>
-import TopProgress from 'vue-top-progress'
 import UrlMap from './sign_in_url_map'
+import Net from '@/common/libs/net/net'
 import Util from '@/common/libs/utils/util'
+import Config from '@/common/config/config'
 
 export default {
   data () {
     return {
-      email: '',
-      password: ''
+      snackbar_opotion: {
+        show: false,
+        color: '',
+        multi_line: false,
+        vertical: false,
+        timeout: 6000,
+        text: ''
+      },
+      form: {
+        valid: false,
+        loading: false,
+        name: {
+          value: '',
+          rules: [
+            v => !!v || 'Name is required',
+            v => (v && v.length <= 10) || 'Name must be less than 10 characters'
+          ]
+        },
+        email: {
+          value: '',
+          rules: [
+            v => !!v || 'E-mail is required',
+            v => /^\w+([.-]?\w+)*@\w+([.-]?\w+)*(\.\w{2,3})+$/.test(v) || 'E-mail must be valid'
+          ]
+        },
+        password: {
+          value: '',
+          visible: false,
+          rules: [
+            v => !!v || 'Password is required',
+            v => (v && v.length >= 6) || 'Password must be more than 6 characters'
+          ]
+        }
+      }
     }
   },
   methods: {
+    snackbar (text) {
+      this.snackbar_opotion.text = text
+      this.snackbar_opotion.show = true
+    },
     onSubmit: function () {
-      if (!this.email) {
-        $('body').snackbar({alive: 3500, content: '邮箱不能为空'})
-      } else if (!this.password) {
-        $('body').snackbar({alive: 3500, content: '密码不能为空'})
-      } else {
-        //  Util.network.postData.config.authUrl = location.pathname
-        Util.network.postData.init(UrlMap.auth_url, {
-          email: this.email,
-          password: this.password
-        }, null, function (data) {
-          window.location.replace(data.Addition)
-        })
-      } // else end
+      //  Util.network.postData.config.authUrl = location.pathname
+      this.form.loading = true
+      Net.apiPost(UrlMap.auth_url, {
+        email: this.form.email.value,
+        password: this.form.password.value
+      }, (data) => { // on success
+        sessionStorage.setItem(Config.jwt.jwt_session_name_admin, data.addition.jwt_token)
+        window.location.replace(data.addition.next + '?' + Config.jwt.jwt_koten_request_name + '=' + data.addition.jwt_token)
+      }, (e) => { // on error
+        this.snackbar(Util.messages.SnackbarErrorMessage)
+      }, (error) => { // on response error
+        console.log(error)
+        for (let key in error) {
+          let message = error[key]
+          this.snackbar(message)
+          return
+        }
+      }, null, (code, message) => {
+        this.form.loading = false
+      })
     }
-  },
-  components: {
-    TopProgress
   }
 }
 </script>

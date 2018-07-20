@@ -27,7 +27,7 @@ const routersMap = [
 ]
 
 const RouterConfig = {
-  mode: 'history',
+  mode: 'hash',
   routes: routersMap
 }
 

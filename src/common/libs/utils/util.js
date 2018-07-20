@@ -1,5 +1,3 @@
-import Cookies from 'js-cookie'
-
 let util = {}
 util.title = function (title) {
   title = title || 'Blog-Home'
@@ -9,7 +7,10 @@ util.title = function (title) {
 util.messages = {
   NormalErrorSnackBar: '<a data-dismiss="snackbar">Dismiss</a>' + '<div class="snackbar-text">Oh,Snap! 出了点错误,请' + '<a href="javascript:location.reload() ">刷新</a>' + '后重试.</div>',
   NoAuthCommentSnackBar: '<a data-dismiss="snackbar">Dismiss</a>' + '<div class="snackbar-text">你需要' + '<a data-toggle="modal" data-target="#auth_model">登录认证</a>' + '后才能添加评论.</div>',
-  NoAuthReplySnackBar: '<a data-dismiss="snackbar">Dismiss</a>' + '<div class="snackbar-text">你需要' + '<a data-toggle="modal" data-target="#auth_model">登录认证</a>' + '后才能添加回复.</div>'
+  NoAuthReplySnackBar: '<a data-dismiss="snackbar">Dismiss</a>' + '<div class="snackbar-text">你需要' + '<a data-toggle="modal" data-target="#auth_model">登录认证</a>' + '后才能添加回复.</div>',
+  SnackbarErrorMessage: 'Oh,Snap! 出了点错误,请刷新后重试.',
+  SnackbarNoAuthComment: '你需要 登录认证 后才能添加评论.',
+  SnackbarNoAuthReply: '你需要 登录认证 后才能添加回复..'
 }
 
 util.ui = {
@@ -28,7 +29,7 @@ util.network = {
         snackBarAlive: 4000,
         multiError: true,
         showNext: false,
-        authUrl: this.config.authUrl
+        authUrl: this.config.pages.admin_signin_page
       }, o)
       if (!onError) {
         onError = function () {
@@ -66,53 +67,6 @@ util.network = {
           $('body').snackbar({content: '请<a href=\'' + url + '\'>登录</a>后进行操作', alive: options.snackBarAlive})
         }
       }
-      this.execute(url, data, onPostSuccess, onUnAuth, onPostError, onError, onFinish)
-    },
-    execute: function (url, data, onPostSuccess, onUnAuth, onPostError, onError, onFinish) {
-      let xsrf
-      let finish = function (code) {
-        if (onFinish) {
-          onFinish(code)
-        }
-      }
-      if (!(xsrf = util.tools.loadXSRFCookie())) {
-        onError()
-        finish(0)
-        return
-      }
-      $.ajax({
-        type: 'POST',
-        url: url,
-        data: $.extend({}, {_xsrf: xsrf}, data),
-        success: function (data) {
-          try {
-            switch (data.Status) {
-              case 0:
-                onPostError(data.Error)
-                finish(1)
-                break
-              case 1:
-                if (onPostSuccess) {
-                  onPostSuccess(data)
-                }
-                finish(2)
-                break
-            }
-          } catch (err) {
-            onError()
-            finish(3)
-          }
-        },
-        error: function (r, err) {
-          if (r.status === 401) {
-            onUnAuth()
-            finish(4)
-          } else {
-            onError()
-            finish(5)
-          }
-        }
-      })
     }
   },
   simpleParseError: {
@@ -190,13 +144,6 @@ util.tools = {
 
     dec = tmpArr.join('')
     return decodeURIComponent(escape(dec.replace(/\0+$/, '')))
-  },
-  loadXSRFCookie () {
-    try { // cookie may be null or something else bad data
-      return util.tools.base64_decode(Cookies.get('_xsrf').split('|')[0])
-    } catch (err) {
-      return ''
-    }
   },
   formatTime (value) {
     if (typeof value !== 'number') {

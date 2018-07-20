@@ -43,7 +43,7 @@ const routersMap = [
 
 const RouterConfig = {
   base: ApiMap.common.prefix,
-  mode: 'history',
+  mode: 'hash',
   routes: routersMap
 }
 
