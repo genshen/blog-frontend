@@ -1,6 +1,6 @@
 import Vue from 'vue'
 import VueRouter from 'vue-router'
-import Util from '../../common/libs/utils/util'
+import Util from '@/common/libs/utils/util'
 
 Vue.use(VueRouter)
 
@@ -23,6 +23,10 @@ const routersMap = [
     path: '/detail/:id',
     name: 'detail',
     component: (resolve) => require(['./views/detail.vue'], resolve)
+    // route level code-splitting
+    // this generates a separate chunk (about.[hash].js) for this route
+    // which is lazy-loaded when the route is visited.
+    // component: () => import(/* webpackChunkName: "about" */ './views/About.vue')
   }
 ]
 

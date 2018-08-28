@@ -79,14 +79,14 @@
             </div>
             <div class="tab-pane fade" id="article_edit_preview">
               <article class="article-markdown markdown-preview">
-                <Markdown :marked="article_content"></Markdown>
+        <Markdown :marked="article_content"></Markdown>
               </article>
             </div>
           </div>
         </div> <!---/col-md-12-->
       </div>
     </div>
-  </div>
+            </div>
 </template>
 
 <script>
@@ -133,6 +133,7 @@ export default {
             }
           }
         },
+        // eslint-disable-next-line
         error: function (req, err) {
           $('body').snackbar({alive: 3000, content: '获取上传配置信息出错了'})
         }
@@ -147,7 +148,8 @@ export default {
         this.onImageUploadFail(image, e)
       }
     },
-    onImageUploadFail (image, err) { // todo error of session timeout
+    // eslint-disable-next-line
+    onImageUploadFail (image, e) { // todo error of session timeout
       $('body').snackbar({alive: 3000, content: '上传出错了'})
     },
     submit () {

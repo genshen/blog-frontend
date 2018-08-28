@@ -6,6 +6,7 @@
 export default {
   methods: {},
   ready: function () {
+    // eslint-disable-next-line
     console.log('Article List Ready')
   }
 }

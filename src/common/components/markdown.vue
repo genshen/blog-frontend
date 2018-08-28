@@ -14,7 +14,7 @@
   }
 </style>
 <style lang="scss">
-  @import '../../common/libs/prism/themes/prism.css';
+  @import '@/common/libs/prism/themes/prism.css';
 </style>
 
 <template>
@@ -23,7 +23,7 @@
 
 <script>
 import MarkdownIt from 'markdown-it'
-import Prism from '../libs/prism/prismjs'
+import Prism from '@/common/libs/prism/prismjs'
 export default {
   name: 'markdown',
   props: {
@@ -46,7 +46,9 @@ export default {
         if (code) {
           try {
             return Prism.highlight(code, Prism.languages[lang], lang)
-          } catch (__) {}
+          } catch (__) {
+            return null
+          }
         }
         return code // use external default escaping
       }

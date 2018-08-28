@@ -6,7 +6,7 @@ module.exports = {
             // entry for the page
             entry: 'src/modules/home/main.js',
             // the source template
-            template: 'src/templates/index.ejs',
+            template: 'public/index.html',
             // output as dist/index.html
             filename: 'views/home/index.html',
             // when using title option,
@@ -18,18 +18,18 @@ module.exports = {
         },
         sign_in: {
             entry: 'src/modules/admin/auth/sign_in.js',
-            template: 'src/templates/index.ejs',
+            template: 'public/index.html',
             filename: 'views/admin/auth/sign_in.html',
             title: 'Admin Sign In',
-            chunks: ['chunk-vendors', 'chunk-common', 'index']
+            chunks: ['chunk-vendors', 'chunk-common', 'sign_in']
         },
-        panel: {
-            entry: 'src/modules/admin/panel/main.js',
-            template: 'src/templates/index.ejs',
-            filename: 'views/admin/panel/index.html',
-            title: 'Admin Panel',
-            chunks: ['chunk-vendors', 'chunk-common', 'index']
-        },
+        // panel: {
+        //     entry: 'src/modules/admin/panel/main.js',
+        //     template: 'public/index.html',
+        //     filename: 'views/admin/panel/index.html',
+        //     title: 'Admin Panel',
+        //     chunks: ['chunk-vendors', 'chunk-common', 'panel']
+        // },
     },
     css: {
         // Whether to enable source maps for CSS. Setting this to true may affect build performance.

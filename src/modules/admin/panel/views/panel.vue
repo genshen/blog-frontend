@@ -30,6 +30,7 @@ export default {
     MiniCard
   },
   ready () {
+    // eslint-disable-next-line
     console.log('Home Ready.')
   },
   methods: {}
