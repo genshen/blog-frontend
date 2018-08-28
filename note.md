@@ -7,3 +7,6 @@ at assets/sass:
 //todo 修改相对路径为全局的@路径
 note:
 修改github localhost
+
+$ jquery in 
+todo remove node-sass and sass-loader package. (and in .eslintignore file)
