@@ -1,6 +1,6 @@
 import Vue from 'vue'
 import VueRouter from 'vue-router'
-import Util from '../../../common/libs/utils/util'
+import Util from '@/common/libs/utils/util'
 import ApiMap from './utils/api_map'
 
 Vue.use(VueRouter)

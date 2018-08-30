@@ -12,5 +12,6 @@ Vue.config.productionTip = false
 new Vue({
   el: '#app',
   router: Routers,
+  i18n: Locales,
   render: h => h(App)
 })

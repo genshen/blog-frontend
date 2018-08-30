@@ -4,7 +4,7 @@ import pages from './pages'
 const env = process.env.NODE_ENV
 let config = {
   ajaxDomain: env === 'development'
-    ? 'http://localhost:8090' // location.origin
+    ? location.origin  // 'http://localhost:8090' use http-proxy-middleware
     : env === 'production'
       ? 'https://gensh.me'
       : 'https://debug.gensh.me',
@@ -13,9 +13,9 @@ let config = {
   blog: {
     maxCommentLength: 20
   },
-  jwt: {
+  axios: {
     jwt_session_name_admin: '_jwt',
-    jwt_koten_request_name: '_jwt'
+    jwt_token_request_name: '_jwt'
   }
 }
 

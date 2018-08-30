@@ -25,6 +25,7 @@
     "vue-template-compiler": "^2.5.17",
     "node-sass": "^4.9.0",
     "sass-loader": "^7.0.3",
+    "css-loader":"^1.0.0",
     "vue-cli-plugin-vuetify": "^0.1.6"
   },
   "eslintConfig": {

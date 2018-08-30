@@ -1,5 +1,5 @@
 <template>
-  <v-container  grid-list-lg>
+  <v-container grid-list-lg>
     <v-flex sm12>
       <h2>Posts</h2>
     </v-flex>
@@ -16,6 +16,12 @@
     <v-flex sm12>
       <h2>Category</h2>
     </v-flex>
+    <v-layout row wrap>
+      <!-- mini statistic start -->
+      <v-flex lg3 sm6 xs12>
+        <mini-card icon="view_list" color="red" :router="{name: 'category'}" title="Category List"></mini-card>
+      </v-flex>
+    </v-layout>
 
     <v-flex sm12>
       <h2>System</h2>

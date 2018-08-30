@@ -36,14 +36,17 @@
            href="javascript:void(0)">删除</a>
       </div>
     </div>
-    <a class="add-image waves-effect waves-attach waves-circle fbtn fbtn-lg" @click="addUploadImage">
-      <i class="icon">add</i></a>
+    <v-btn fab dark color="indigo" @click="addUploadImage">
+      <v-icon dark>add</v-icon>
+    </v-btn>
   </div>
 </template>
 
 <script>
-/**
-   * props:option(Object)
+import net from "@/common/libs/net/net"
+
+  /**
+   * props:
    *   customUpload: be false by default;
    *   data: addition data(key-value) in HTTP-Post body.(using FormData)
    *  event: @on-success=func(image,data);@on-fail=func(image,error) ; @on-upload=func(image,optional)
@@ -76,6 +79,15 @@ export default {
       }
     }
   },
+  computed: {
+    option () {
+      return {
+        upload_path: this.upload_path,
+        custom_upload: this.custom_upload,
+        data: this.data
+      }
+    }
+  },
   methods: {
     addUploadImage: function () {
       $('#upload_image_input').trigger('click') // token checker?
@@ -105,6 +117,7 @@ export default {
         return
       }
       if (!this.option.upload_path) {
+        // todo toast error.
         return
       }
       let data = new FormData()
@@ -115,21 +128,12 @@ export default {
         }
       }
       image.status = 1
-      $.ajax({
-        url: this.option.upload_path,
-        type: 'POST',
-        data: data,
-        context: this,
-        cache: false,
-        processData: false,
-        contentType: false,
-        success: function (data) {
-          this.$emit('on-success', image, data)
-        },
-        error: function (err) {
-          image.status = -1
-          this.$emit('on-fail', image, err)
-        }
+      net.axiosFileInstance.post(this.option.upload_path, data, net.axios.load_admin_jwt_config())
+        .then((response) => {
+          this.$emit('on-success', image, response.data)
+        }).catch((err) => {
+        image.status = -1
+        this.$emit('on-fail', image, err)
       })
     }
   }

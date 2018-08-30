@@ -162,13 +162,12 @@ export default {
       Net.apiPost(UrlMap.auth_url, {
         email: this.form.email.value,
         password: this.form.password.value
-      }, (data) => { // on success
-        sessionStorage.setItem(Config.jwt.jwt_session_name_admin, data.addition.jwt_token)
-        window.location.replace(data.addition.next + '?' + Config.jwt.jwt_koten_request_name + '=' + data.addition.jwt_token)
+      }, null, (data) => { // on success
+        sessionStorage.setItem(Config.axios.jwt_session_name_admin, data.addition.jwt_token)
+        window.location.replace(data.addition.next)
       }, (e) => { // on error
         this.snackbar(Util.messages.SnackbarErrorMessage)
       }, (error) => { // on response error
-        console.log(error)
         for (let key in error) {
           let message = error[key]
           this.snackbar(message)

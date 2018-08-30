@@ -23,17 +23,28 @@ module.exports = {
             title: 'Admin Sign In',
             chunks: ['chunk-vendors', 'chunk-common', 'sign_in']
         },
-        // panel: {
-        //     entry: 'src/modules/admin/panel/main.js',
-        //     template: 'public/index.html',
-        //     filename: 'views/admin/panel/index.html',
-        //     title: 'Admin Panel',
-        //     chunks: ['chunk-vendors', 'chunk-common', 'panel']
-        // },
+        panel: {
+            entry: 'src/modules/admin/panel/main.js',
+            template: 'public/index.html',
+            filename: 'views/admin/panel/index.html',
+            title: 'Admin Panel',
+            chunks: ['chunk-vendors', 'chunk-common', 'panel']
+        },
     },
     css: {
         // Whether to enable source maps for CSS. Setting this to true may affect build performance.
         sourceMap: true
+    },
+    devServer: {
+      proxy: 'http://localhost:8090'
+      // proxyTable: {
+      //   '/s/api': {
+      //     target: 'http://localhost:8090',
+      //     changeOrigin: true,
+      //     // pathRewrite: {
+      //     //   '^/at': '/at'   //api
+      //     // }
+      //   }
+      // },
     }
-// todo proxyTable
 }

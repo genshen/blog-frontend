@@ -18,6 +18,12 @@ net.axiosInstance = axios.create({
   headers: {'Content-Type': 'application/x-www-form-urlencoded'}
 })
 
+net.axiosFileInstance = axios.create({
+  timeout: 30000,
+  headers: {'Content-Type': 'multipart/form-data'}
+})
+
+
 net.getXSRFCookie = function () {
   try { // cookie may be null or something else bad data
     return util.tools.base64_decode(Cookies.get('_xsrf').split('|')[0])
@@ -29,13 +35,14 @@ net.getXSRFCookie = function () {
  * post data to backend
  * @param target target url
  * @param data post data
+ * @param config axios config
  * @param onSuccess callback if success
  * @param onError callback if has error (e.g. network error(no network connection))
  * @param onResponseError callback for error in response data.
  * @param onUnAuth callback if backend returns an un auth code.
  * @param cleanup clean up after each post.
  */
-net.apiPost = function (target, data, onSuccess, onError, onResponseError, onUnAuth, cleanup) {
+net.apiPost = function (target, data, config, onSuccess, onError, onResponseError, onUnAuth, cleanup) {
   if (!onSuccess) {
     onSuccess = function () {}
   }
@@ -52,7 +59,7 @@ net.apiPost = function (target, data, onSuccess, onError, onResponseError, onUnA
     cleanup = function () {}
   }
 
-  if (!Config.isDevMode) { // ignore in dev mode
+  if (!Config.isDevMode()) { // ignore in dev mode
     let xsrf
     if (!(xsrf = net.getXSRFCookie())) {
       onError('no xsrf')
@@ -62,7 +69,7 @@ net.apiPost = function (target, data, onSuccess, onError, onResponseError, onUnA
     data._xsrf = xsrf
   }
 
-  net.axiosInstance.post(target, data).then(function (response) {
+  net.axiosInstance.post(target, data, config).then(function (response) {
     try { // process response data
       switch (response.data.status) {
         case 0:
@@ -91,6 +98,16 @@ net.apiPost = function (target, data, onSuccess, onError, onResponseError, onUnA
       cleanup(6, 'error in post')
     }
   })
+}
+
+net.axios = {}
+net.axios.load_admin_jwt_config = function () {
+  let jwt = sessionStorage.getItem(Config.axios.jwt_session_name_admin)
+  if (jwt) {
+    return {headers: {"Authorization": "Bearer " + jwt}}
+  } else {
+    return {}
+  }
 }
 
 export default net

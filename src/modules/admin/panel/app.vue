@@ -31,9 +31,17 @@
         </template>
       </v-list>
     </v-navigation-drawer>
+
     <v-toolbar light fixed app>
       <v-toolbar-side-icon @click.stop="drawer = !drawer"></v-toolbar-side-icon>
       <v-toolbar-title>Panel</v-toolbar-title>
+      <v-spacer></v-spacer>
+      <v-btn icon>
+        <v-icon>search</v-icon>
+      </v-btn>
+      <v-btn icon>
+        <v-icon>apps</v-icon>
+      </v-btn>
     </v-toolbar>
     <v-content>
       <router-view></router-view>
