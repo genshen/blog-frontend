@@ -5,20 +5,20 @@ let utils = {}
 
 // container:Array, which includes those categories
 utils.loadCategories = function (context, container) {
-  net.axiosInstance.get(ApiMap.category.get, net.axios.load_admin_jwt_config())
+  net.axiosInstance.get(ApiMap.category.get)
     .then(function (response) {
       try {
         if (response) {
-          response.forEach(function (e) {
+          response.data.forEach(function (e) {
             container.push(e)
           })
         }
       } catch (e) {
-        $('body').snackbar({alive: 3000, content: '出了点错误,请重试'})
+        context.snackbar('出了点错误,请重试')
       }
-    }).catch(() => {
+    }).catch(() => { // todo un auth.
     // console.log(err)
-    $('body').snackbar({alive: 3000, content: '出了点错误,请重试'})
+    context.snackbar('出了点错误,请重试')
   })
 }
 

@@ -29,7 +29,7 @@ const map = {
     edit: ''
   },
   category: {
-    get: ADMIN_API_PREFIX + '/categories',
+    get: Config.api.blog_api_prefix + '/categories',
     add: ADMIN_API_PREFIX + '/category/add',
     sub_add: ADMIN_API_PREFIX + '/sub_category/add'
   },

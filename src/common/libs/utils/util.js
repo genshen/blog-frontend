@@ -172,42 +172,6 @@ util.tools = {
     }
     let d = new Date(value)
     return d.getFullYear() + '-' + (d.getMonth() + 1) + '-' + d.getDate()
-  },
-  // js load
-  loadJS (srcs, cb) {
-    'use strict'
-    let total = srcs.length
-    let hasLoadedCount = 0
-
-    function onLoadCallback () {
-      hasLoadedCount++
-      if (total === hasLoadedCount && cb && typeof (cb) === 'function') {
-        cb()
-      }
-    }
-
-    for (let index in srcs) {
-      let src = srcs[index]
-      let ref = document.getElementsByTagName('script')[0]
-      let script = document.createElement('script')
-      script.src = src
-      script.async = true
-      ref.parentNode.insertBefore(script, ref)
-      script.onload = onLoadCallback
-    }
-  },
-  loadCSS (src, cb) {
-    'use strict'
-    let head = document.getElementsByTagName('HEAD').item(0)
-    let style = document.createElement('link')
-    style.href = src
-    style.rel = 'stylesheet'
-    style.type = 'text/css'
-    head.appendChild(style)
-    if (cb && typeof (cb) === 'function') {
-      style.onload = cb
-    }
-    return style
   }
 }
 

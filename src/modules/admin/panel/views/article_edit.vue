@@ -7,14 +7,9 @@
 <template>
   <v-container>
     <!--<progress-bar ref="topProgress"></progress-bar>-->
-    <v-snackbar
-      :timeout="snackbar_opotion.timeout"
-      :color="snackbar_opotion.color"
-      :multi-line="snackbar_opotion.multi_line"
-      :vertical="snackbar_opotion.vertical"
-      v-model="snackbar_opotion.show"
-    >
-      {{ snackbar_opotion.text }}
+    <v-snackbar :timeout="snackbar_opotion.timeout" :color="snackbar_opotion.color"
+                :multi-line="snackbar_opotion.multi_line" :vertical="snackbar_opotion.vertical"
+                v-model="snackbar_opotion.show">{{ snackbar_opotion.text }}
       <v-btn flat color="pink" @click.native="snackbar_opotion.show = false">Close</v-btn>
     </v-snackbar>
 
@@ -50,24 +45,17 @@
         <v-card flat>
           <v-text-field v-model="article.article_title" label="Title"  append-icon="title" required></v-text-field>
           <v-text-field v-model="article.article_hash" label="Hash"  append-icon="link" required></v-text-field>
-          <v-select
-            v-model="article.field_tags"
-            :items="test_tags"
-            chips
-            label="Tags"
-            multiple
-            solo
-            append-icon="label"
-          ></v-select>
-
-          <v-textarea
-            name="markdown-input"
-            box auto-grow flat
-            label="Contents Here"
-            rows="10"
-            append-icon="text_fields"
-            v-model="article.article_content"
-          ></v-textarea>
+          <v-layout>
+            <v-flex xs12 sm6>
+              <v-select v-model="article.category_id" :items="categories" item-text="name" item-value="id" label="Category"></v-select>
+            </v-flex>
+            <v-flex xs12 sm6>
+              <v-select v-model="article.sub_category_id" :items="sub_category_items" item-text="name" item-value="id" label="Sub-Category"></v-select>
+            </v-flex>
+          </v-layout>
+          <v-select v-model="article.field_tags" :items="test_tags" label="Tags" chips multiple solo append-icon="label"></v-select>
+          <v-textarea name="markdown-input" box auto-grow flat label="Contents Here" rows="10"
+                      append-icon="text_fields" v-model="article.article_content"></v-textarea>
 
           <v-card-actions>
             <v-btn flat icon color="blue-grey" @click="show_image_dialog = true">
@@ -125,6 +113,7 @@ import ApiMap from '../utils/api_map'
 import net from "@/common/libs/net/net"
 import Util from '@/common/libs/utils/util'
 
+const CATEGORY_ID_EMPTY = 0
 export default {
   data: function () {
     return {
@@ -147,8 +136,8 @@ export default {
         article_title: '',
         article_hash: '',
         field_tags: '',
-        field_category_id: 0,
-        field_sub_category_id: 0,
+        category_id: CATEGORY_ID_EMPTY,
+        sub_category_id: CATEGORY_ID_EMPTY,
         article_content: '',
       },
       submit_loader: {
@@ -179,38 +168,46 @@ export default {
     },
     // eslint-disable-next-line
     onImageUploadFail (image, e) { // todo error of session timeout
-      $('body').snackbar({alive: 3000, content: '上传出错了'})
+      this.snackbar(this.$t('post.edit.error_image_upload'))
     },
     submit () {
       if (!this.article.article_title) {
-        $('body').snackbar({content: '标题不能为空', alive: 4000})
+        this.snackbar(this.$t('post.edit.error_title_blank'))
         return
       } else if (!this.article.article_content) {
-        $('body').snackbar({content: '内容不能为空', alive: 4000})
+        this.snackbar(this.$t('post.edit.error_content_blank'))
         return
       }
       let self = this
-      Util.network.postData.init(ApiMap.article.publish, { // todo category_id
-        category_id: this.article.field_category_id,
-        sub_category_id: this.article.field_category_id,
+      Util.network.postData.init(ApiMap.article.publish, { // todo tags
+        category_id: this.article.category_id,
+        sub_category_id: this.article.sub_category_id,
         title: this.article.article_title,
         content: this.article.article_content,
         summary: (this.article.article_content).replace(/<.*?>/ig, '') // todo Marked
       }, null, function () {
-        $('body').snackbar({content: '文章发布成功', alive: 4000})
+        this.snackbar(this.$t('post.edit.publish_success'))
         self.article.article_title = ''
         self.article.article_content = ''
       })
     }
   },
   computed: {
-    sub_category_set: function () {
+    sub_category_set () {
       if (this.article.field_category_id) {
         for (let index in this.categories) {
           if (this.categories[index].id === this.article.field_category_id) {
             // todo import!! this.field_sub_category_id = 0 // reset sub_category_id
             return this.categories[index].sub_category
           }
+        }
+      }
+      return []
+    },
+    sub_category_items () {
+      for (let i in this.categories) {
+        if (this.categories[i].id === this.article.category_id) {
+          return this.categories[i].sub_category
         }
       }
       return []
@@ -233,15 +230,15 @@ export default {
                 let xsrf = net.getXSRFCookie()
                 this.upload.upload_config.data._xsrf = xsrf
               } catch (err) {
-                this.snackbar('获取上传配置信息出错')
+                this.snackbar(this.$t('common.error_getting_config'))
               }
             }
           }
         } catch (e) {
-          this.snackbar('获取上传配置信息出错',e)
+          this.snackbar(this.$t('common.error_getting_config'))
         }
       }).catch(() => { // todo add un-auth snackbar.
-      this.snackbar('获取上传配置信息出错')
+      this.snackbar(this.$t('common.error_getting_config'))
     })
   }
 }

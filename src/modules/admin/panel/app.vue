@@ -1,4 +1,7 @@
 <style scoped>
+  .clickable-title{
+    cursor: pointer
+  }
 </style>
 
 <template>
@@ -6,8 +9,7 @@
     <v-navigation-drawer v-model="drawer" temporary app  class="grey lighten-4">
       <v-list dense>
         <template v-for="(item, i) in items">
-          <v-layout
-            v-if="item.heading" :key="i" row align-center>
+          <v-layout v-if="item.heading" :key="i" row align-center>
             <v-flex xs6>
               <v-subheader v-if="item.heading">
                 {{ item.heading }}
@@ -18,7 +20,7 @@
             </v-flex>
           </v-layout>
           <v-divider v-else-if="item.divider" :key="i" dark class="my-3"></v-divider>
-          <v-list-tile v-else :key="i"  @click="gotoList">
+          <v-list-tile v-else :key="i" @click="gotoList(item.link)">
             <v-list-tile-action>
               <v-icon>{{ item.icon }}</v-icon>
             </v-list-tile-action>
@@ -34,7 +36,7 @@
 
     <v-toolbar light fixed app>
       <v-toolbar-side-icon @click.stop="drawer = !drawer"></v-toolbar-side-icon>
-      <v-toolbar-title>Panel</v-toolbar-title>
+      <v-toolbar-title class='clickable-title' @click="gotoList({name: 'panel'})">Panel</v-toolbar-title>
       <v-spacer></v-spacer>
       <v-btn icon>
         <v-icon>search</v-icon>
@@ -57,7 +59,7 @@ export default {
   data: () => ({
     drawer: null,
     items: [
-      { icon: 'lightbulb_outline', text: 'Notes' },
+      { icon: 'home', text: 'Home', link: { name:'panel' } },
       { icon: 'touch_app', text: 'Reminders' },
       { divider: true },
       { heading: 'Labels' },
@@ -77,8 +79,10 @@ export default {
     source: String
   },
   methods: {
-    gotoList () {
-      return null
+    gotoList (link) {
+      if (link) {
+        this.$router.push(link)
+      }
     }
   }
 }
