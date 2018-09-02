@@ -24,7 +24,7 @@ const map = {
     upload_token: ADMIN_API_PREFIX + '/upload_token'
   },
   article: {
-    list: ADMIN_API_PREFIX,
+    list: Config.api.blog_api_prefix + '/list',
     publish: ADMIN_API_PREFIX + '/article/publish',
     edit: ''
   },

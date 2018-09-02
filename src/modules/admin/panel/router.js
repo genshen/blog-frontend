@@ -23,7 +23,7 @@ const routersMap = [
     meta: {
       title: 'Article List'
     },
-    component: (resolve) => require(['./views/article_list.vue'], resolve)
+    component: (resolve) => require(['./views/article_list.vue'], resolve) // () => import('./views/article_list.vue')
   }, {
     path: '/article/edit',
     name: 'article_edit',

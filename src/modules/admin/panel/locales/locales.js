@@ -11,6 +11,8 @@ export default {
         'error_image_upload': '上传出错了',
         'error_title_blank': '标题不能为空',
         'error_content_blank': '内容不能为空',
+        'error_hash_blank': 'Hash不能为空',
+        'error_publishing': '文章发布失败',
         'publish_success': '文章发布成功',
       }
     },

@@ -85,7 +85,7 @@
               :disabled="submit_loader.loading"
               color="indigo"
               class="white--text"
-              @click.native="submit_loader.loader = 'submit_loader.loading'">
+              @click.native="submit">
               Upload
               <v-icon right dark>cloud_upload</v-icon>
             </v-btn>
@@ -111,7 +111,6 @@ import ImageUpload from '@/common/components/image-upload'
 import LocalUtils from '../utils/utils'
 import ApiMap from '../utils/api_map'
 import net from "@/common/libs/net/net"
-import Util from '@/common/libs/utils/util'
 
 const CATEGORY_ID_EMPTY = 0
 export default {
@@ -141,7 +140,6 @@ export default {
         article_content: '',
       },
       submit_loader: {
-        loader: null,
         loading: false
       },
       show_image_dialog: false,
@@ -168,42 +166,46 @@ export default {
     },
     // eslint-disable-next-line
     onImageUploadFail (image, e) { // todo error of session timeout
-      this.snackbar(this.$t('post.edit.error_image_upload'))
+      this.snackbar(this.$t('posts.edit.error_image_upload'))
     },
     submit () {
       if (!this.article.article_title) {
-        this.snackbar(this.$t('post.edit.error_title_blank'))
+        this.snackbar(this.$t('posts.edit.error_title_blank'))
         return
       } else if (!this.article.article_content) {
-        this.snackbar(this.$t('post.edit.error_content_blank'))
+        this.snackbar(this.$t('posts.edit.error_content_blank'))
+        return
+      } else if (!this.article.article_hash) {
+        this.snackbar(this.$t('posts.edit.error_hash_blank'))
         return
       }
-      let self = this
-      Util.network.postData.init(ApiMap.article.publish, { // todo tags
+
+      this.submit_loader.loading = true
+      net.apiPost(ApiMap.article.publish, { // todo tags
         category_id: this.article.category_id,
         sub_category_id: this.article.sub_category_id,
         title: this.article.article_title,
         content: this.article.article_content,
         summary: (this.article.article_content).replace(/<.*?>/ig, '') // todo Marked
-      }, null, function () {
-        this.snackbar(this.$t('post.edit.publish_success'))
-        self.article.article_title = ''
-        self.article.article_content = ''
+      }, net.axios.load_admin_jwt_config(), () => { // success
+        this.snackbar(this.$t('posts.edit.publish_success'))
+        this.article.article_title = ''
+        this.article.article_content = ''
+        this.article.article_hash = ''
+        this.article.category_id = CATEGORY_ID_EMPTY
+        this.article.sub_category_id = CATEGORY_ID_EMPTY
+      }, () => { // on error
+        this.snackbar(this.$t('posts.edit.error_publishing'))
+      }, () => { // response error
+        this.snackbar(this.$t('posts.edit.error_publishing'))
+      }, () => { // un auth
+        this.snackbar(this.$t('posts.common.error_auth_needed'))
+      }, () => {
+        this.submit_loader.loading = false
       })
     }
   },
   computed: {
-    sub_category_set () {
-      if (this.article.field_category_id) {
-        for (let index in this.categories) {
-          if (this.categories[index].id === this.article.field_category_id) {
-            // todo import!! this.field_sub_category_id = 0 // reset sub_category_id
-            return this.categories[index].sub_category
-          }
-        }
-      }
-      return []
-    },
     sub_category_items () {
       for (let i in this.categories) {
         if (this.categories[i].id === this.article.category_id) {
