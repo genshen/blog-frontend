@@ -165,7 +165,7 @@ export default {
       }, null, (data) => { // on success
         sessionStorage.setItem(Config.axios.jwt_session_name_admin, data.addition.jwt_token)
         window.location.replace(data.addition.next)
-      }, (e) => { // on error
+      }, () => { // on error (e.g. network)
         this.snackbar(Util.messages.SnackbarErrorMessage)
       }, (error) => { // on response error
         for (let key in error) {
@@ -173,7 +173,7 @@ export default {
           this.snackbar(message)
           return
         }
-      }, null, (code, message) => {
+      }, null, () => {
         this.form.loading = false
       })
     }
