@@ -3,6 +3,7 @@
 // import "@babel/polyfill"
 import Vue from 'vue'
 import '@/plugins/vuetify'
+import '@/plugins/vuetify_snackbar'
 import VueProgressBar from 'vue-progressbar'
 import Routers from './router'
 import App from './app.vue'

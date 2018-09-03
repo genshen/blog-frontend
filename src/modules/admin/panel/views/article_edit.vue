@@ -7,12 +7,6 @@
 <template>
   <v-container>
     <!--<progress-bar ref="topProgress"></progress-bar>-->
-    <v-snackbar :timeout="snackbar_opotion.timeout" :color="snackbar_opotion.color"
-                :multi-line="snackbar_opotion.multi_line" :vertical="snackbar_opotion.vertical"
-                v-model="snackbar_opotion.show">{{ snackbar_opotion.text }}
-      <v-btn flat color="pink" @click.native="snackbar_opotion.show = false">Close</v-btn>
-    </v-snackbar>
-
     <v-dialog v-model="show_image_dialog" max-width="720px">
       <v-card>
         <v-card-title class="headline">上传图片</v-card-title>
@@ -116,14 +110,6 @@ const CATEGORY_ID_EMPTY = 0
 export default {
   data: function () {
     return {
-      snackbar_opotion: {
-        show: false,
-        color: '',
-        multi_line: false,
-        vertical: false,
-        timeout: 6000,
-        text: ''
-      },
       categories: [],
       upload: {
         image_file_domain: '',
@@ -151,10 +137,6 @@ export default {
     ImageUpload
   },
   methods: {
-    snackbar (text) {
-      this.snackbar_opotion.text = text
-      this.snackbar_opotion.show = true
-    },
     onImageUploadSuccess (image, data) {
       try {
         this.article.article_content += '![image](' + this.upload.image_file_domain + data.key + ')\r\n' // qiniu file upload.
@@ -166,17 +148,17 @@ export default {
     },
     // eslint-disable-next-line
     onImageUploadFail (image, e) { // todo error of session timeout
-      this.snackbar(this.$t('posts.edit.error_image_upload'))
+      this.$snackbar(this.$t('posts.edit.error_image_upload'))
     },
     submit () {
       if (!this.article.article_title) {
-        this.snackbar(this.$t('posts.edit.error_title_blank'))
+        this.$snackbar(this.$t('posts.edit.error_title_blank'))
         return
       } else if (!this.article.article_content) {
-        this.snackbar(this.$t('posts.edit.error_content_blank'))
+        this.$snackbar(this.$t('posts.edit.error_content_blank'))
         return
       } else if (!this.article.article_hash) {
-        this.snackbar(this.$t('posts.edit.error_hash_blank'))
+        this.$snackbar(this.$t('posts.edit.error_hash_blank'))
         return
       }
 
@@ -188,18 +170,18 @@ export default {
         content: this.article.article_content,
         summary: (this.article.article_content).replace(/<.*?>/ig, '') // todo Marked
       }, net.axios.load_admin_jwt_config(), () => { // success
-        this.snackbar(this.$t('posts.edit.publish_success'))
+        this.$snackbar(this.$t('posts.edit.publish_success'))
         this.article.article_title = ''
         this.article.article_content = ''
         this.article.article_hash = ''
         this.article.category_id = CATEGORY_ID_EMPTY
         this.article.sub_category_id = CATEGORY_ID_EMPTY
       }, () => { // on error
-        this.snackbar(this.$t('posts.edit.error_publishing'))
+        this.$snackbar(this.$t('posts.edit.error_publishing'))
       }, () => { // response error
-        this.snackbar(this.$t('posts.edit.error_publishing'))
+        this.$snackbar(this.$t('posts.edit.error_publishing'))
       }, () => { // un auth
-        this.snackbar(this.$t('posts.common.error_auth_needed'))
+        this.$snackbar(this.$t('posts.common.error_auth_needed'))
       }, () => {
         this.submit_loader.loading = false
       })
@@ -232,15 +214,15 @@ export default {
                 let xsrf = net.getXSRFCookie()
                 this.upload.upload_config.data._xsrf = xsrf
               } catch (err) {
-                this.snackbar(this.$t('common.error_getting_config'))
+                this.$snackbar(this.$t('common.error_getting_config'))
               }
             }
           }
         } catch (e) {
-          this.snackbar(this.$t('common.error_getting_config'))
+          this.$snackbar(this.$t('common.error_getting_config'))
         }
       }).catch(() => { // todo add un-auth snackbar.
-      this.snackbar(this.$t('common.error_getting_config'))
+      this.$snackbar(this.$t('common.error_getting_config'))
     })
   }
 }

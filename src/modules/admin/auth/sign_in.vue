@@ -26,17 +26,6 @@
 <template>
   <v-app id="login" class="indigo">
     <!--<progress-bar ref="topProgress"></progress-bar>-->
-    <v-snackbar
-      :timeout="snackbar_opotion.timeout"
-      :color="snackbar_opotion.color"
-      :multi-line="snackbar_opotion.multi_line"
-      :vertical="snackbar_opotion.vertical"
-      v-model="snackbar_opotion.show"
-    >
-      {{ snackbar_opotion.text }}
-      <v-btn flat color="pink" @click.native="snackbar_opotion.show = false">Close</v-btn>
-    </v-snackbar>
-
     <v-content>
       <v-container fluid fill-height>
         <v-layout align-center justify-center>
@@ -115,14 +104,6 @@ import Config from '@/common/config/config'
 export default {
   data () {
     return {
-      snackbar_opotion: {
-        show: false,
-        color: '',
-        multi_line: false,
-        vertical: false,
-        timeout: 6000,
-        text: ''
-      },
       form: {
         valid: false,
         loading: false,
@@ -152,10 +133,6 @@ export default {
     }
   },
   methods: {
-    snackbar (text) {
-      this.snackbar_opotion.text = text
-      this.snackbar_opotion.show = true
-    },
     onSubmit: function () {
       //  Util.network.postData.config.authUrl = location.pathname
       this.form.loading = true
@@ -166,11 +143,11 @@ export default {
         sessionStorage.setItem(Config.axios.jwt_session_name_admin, data.addition.jwt_token)
         window.location.replace(data.addition.next)
       }, () => { // on error (e.g. network)
-        this.snackbar(Util.messages.SnackbarErrorMessage)
+        this.$snackbar(Util.messages.SnackbarErrorMessage)
       }, (error) => { // on response error
         for (let key in error) {
           let message = error[key]
-          this.snackbar(message)
+          this.$snackbar(message)
           return
         }
       }, null, () => {

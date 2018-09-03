@@ -1,12 +1,6 @@
 <template>
   <v-container>
     <v-layout>
-      <v-snackbar :timeout="snackbar_opotion.timeout" :color="snackbar_opotion.color"
-                  :multi-line="snackbar_opotion.multi_line" :vertical="snackbar_opotion.vertical"
-                  v-model="snackbar_opotion.show">{{ snackbar_opotion.text }}
-        <v-btn flat color="pink" @click.native="snackbar_opotion.show = false">Close</v-btn>
-      </v-snackbar>
-
       <v-dialog v-model="dialog.add_category" persistent max-width="720px">
         <v-card>
           <v-card-title>
@@ -123,14 +117,6 @@ export default {
         add_category: false,
         add_sub_category: false
       },
-      snackbar_opotion: {
-        show: false,
-        color: '',
-        multi_line: false,
-        vertical: false,
-        timeout: 6000,
-        text: ''
-      },
       categories: [],
       new_category_name: '',
       new_category_slug: '',
@@ -142,14 +128,10 @@ export default {
     }
   },
   methods: {
-    snackbar (text) {
-      this.snackbar_opotion.text = text
-      this.snackbar_opotion.show = true
-    },
     addCategory () {
       if (!this.new_category_submitting) {
         if (this.new_category_name === '' || this.new_category_slug === '') {
-          this.snackbar(this.$t('category.error_adding_not_filled')) // todo
+          this.$snackbar(this.$t('category.error_adding_not_filled')) // todo
           return
         }
         this.new_category_submitting = true // todo loading.
@@ -167,20 +149,20 @@ export default {
               })
               this.new_category_name = ''
               this.new_category_name = ''
-              this.snackbar(this.$t('category.category_adding_success'))
+              this.$snackbar(this.$t('category.category_adding_success'))
             } else {
-              this.snackbar(this.$t('category.error_adding_category'))
+              this.$snackbar(this.$t('category.error_adding_category'))
             }
           }, () => {    // on error(e.g. network)
-            this.snackbar(this.$t('category.error_adding_category'))
+            this.$snackbar(this.$t('category.error_adding_category'))
           },(error) => { // on response error
             for (let key in error) {
               let message = error[key]
-              this.snackbar(message)
+              this.$snackbar(message)
               return
             }
           }, () =>{ // on un_auth
-            this.snackbar(this.$t('common.error_auth_needed'))
+            this.$snackbar(this.$t('common.error_auth_needed'))
           }, () => { // on finish
             this.dialog.add_category = false
             this.new_category_submitting = false
@@ -198,7 +180,7 @@ export default {
     },
     addSubCategory () {
       if (this.new_sub_category_name === '' || this.new_sub_category_slug === '') {
-        this.snackbar(this.$t('error_adding_sub_not_filled'))
+        this.$snackbar(this.$t('error_adding_sub_not_filled'))
         return
       }
       // let _id = this.categories[index].id
@@ -212,17 +194,17 @@ export default {
           this.addSubToCategory(this.new_sub_category_type, data.addition, this.new_sub_category_name, this.new_sub_category_slug, 0)
           self.new_sub_category_name = ''
           self.new_sub_category_slug = ''
-          this.snackbar('子分类添加成功')
+          this.$snackbar('子分类添加成功')
         },() => {    // on error(e.g. network)
-          this.snackbar(this.$t('category.error_adding_sub_category'))
+          this.$snackbar(this.$t('category.error_adding_sub_category'))
         },(error) => { // on response error
           for (let key in error) {
             let message = error[key]
-            this.snackbar(message)
+            this.$snackbar(message)
             return
           }
         }, () =>{ // on un_auth
-          this.snackbar(this.$t('common.error_auth_needed'))
+          this.$snackbar(this.$t('common.error_auth_needed'))
         }, () => {
         this.new_sub_category_submitting = false
         this.dialog.add_sub_category = false
