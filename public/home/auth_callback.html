@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=0"/>
+  <meta name="theme-color" content="#1ba10f">
+  <title>登录认证</title>
+  <style>
+    * {
+      margin: 0;
+    }
+
+    html, body {
+      height: 100%;
+    }
+
+    .ui-main {
+      height: 100%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+
+      text-align: center;
+      font-family: "Helvetica Neue", Helvetica, "PingFang SC", "Hiragino Sans GB", "Microsoft YaHei", "微软雅黑", Arial, sans-serif;
+    }
+
+    #message {
+
+    }
+
+    /*color is copy from iview.js: https://github.com/iview/iview*/
+    .primary {
+      color: #2d8cf0;
+    }
+
+    .success {
+      color: #19be6b
+    }
+
+    .error {
+      color: #ed4014
+    }
+
+    .warning {
+      color: #ff9900
+    }
+
+    .title {
+      color: #17233d
+    }
+
+    .bg {
+      /*background-color: #fafafa;*/
+    }
+  </style>
+</head>
+<body>
+<main class="ui-main bg">
+  <h3 id="message"></h3>
+</main>
+<script>
+  try {
+    var result = JSON.parse('<<<.json>>>')
+    if (result.status === 1) { // ok
+      if (result.addition) {
+        if (window.opener) {
+          window.opener.postMessage(result, location.origin)
+          window.close()
+        } else {
+          setMessage('warning', 'Warning: no window opener found.')
+        }
+      } else {
+        setMessage('error', 'Error: no oauth2 jwt token fount.')
+      }
+    } else {
+      setMessage('error', result.error)
+    }
+  } catch (e) {
+    setMessage('error', 'Error processing response data.')
+  }
+
+  function setMessage(status, msg) {
+    var message_box = document.getElementById('message')
+    message_box.className = status
+    message_box.innerText = msg
+  }
+</script>
+</body>
+</html>

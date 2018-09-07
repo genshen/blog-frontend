@@ -1,1 +1,1 @@
-export const is_auth = () => false
+export const isAuth = () => false
