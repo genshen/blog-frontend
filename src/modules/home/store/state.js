@@ -13,5 +13,5 @@ export default {
     name: '',
     source_code: ''
   },
-  categories: null,
+  categories: null
 }

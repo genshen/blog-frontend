@@ -132,7 +132,7 @@ export default {
     }
   },
   methods: {
-    onSubmit: function () {
+    onSubmit () {
       //  Util.network.postData.config.authUrl = location.pathname
       this.form.loading = true
       Net.apiPost(UrlMap.auth_url, {
@@ -144,8 +144,8 @@ export default {
       }, () => { // on error (e.g. network)
         this.$snackbar(Util.messages.SnackbarErrorMessage)
       }, (error) => { // on response error
-        for (let key in error) {
-          let message = error[key]
+        for (const key in error) {
+          const message = error[key]
           this.$snackbar(message)
           return
         }

@@ -28,15 +28,15 @@
 </template>
 
 <script>
-  import * as CC from './comment_config'
+import * as CC from './comment_config'
 
-  export default {
-    name: "comp_status",
-    props: {
-      status: {
-        type: Number,
-        default: CC.COM_STATUS_UNINIT,
-      },
+export default {
+  name: 'comp_status',
+  props: {
+    status: {
+      type: Number,
+      default: CC.COM_STATUS_UNINIT
     }
   }
+}
 </script>

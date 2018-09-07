@@ -2,14 +2,14 @@ import api from './api'
 import pages from './pages'
 
 const env = process.env.NODE_ENV
-let config = {
+const config = {
   ajaxDomain: env === 'development'
-    ? location.origin  // 'http://localhost:8090' use http-proxy-middleware
+    ? location.origin // 'http://localhost:8090' use http-proxy-middleware
     : env === 'production'
       ? 'https://gensh.me'
       : 'https://debug.gensh.me',
-  api: api,
-  pages: pages,
+  api,
+  pages,
   blog: {
     maxCommentLength: 20
   },
@@ -17,7 +17,7 @@ let config = {
     jwt_session_name_admin: '_jwt',
     jwt_token_request_name: '_jwt',
     jwt_oauth2_session_name: '_jwt_oauth2',
-    jwt_oauth2_session_request_name: '_jwt_oauth2',
+    jwt_oauth2_session_request_name: '_jwt_oauth2'
   }
 }
 

@@ -6,7 +6,7 @@ import store from './store'
 import '@/plugins/vuetify'
 import '@/plugins/vuetify_snackbar'
 import VueProgressBar from 'vue-progressbar'
-import Locales from "./locales"
+import Locales from './locales'
 import Routers from './router'
 import App from './app.vue'
 

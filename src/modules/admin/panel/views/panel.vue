@@ -31,6 +31,7 @@
 
 <script>
 import MiniCard from './widget_minicard'
+
 export default {
   components: {
     MiniCard

@@ -4,17 +4,17 @@
  */
 import Snackbar from './snackbar.vue'
 
-function init(Vue, options = {}) {
+function init (Vue, options = {}) {
   let cmp = null
   const property = options.property || '$snackbar'
 
-  function createCmp(options) {
+  function createCmp (options) {
     cmp = new Vue(Snackbar)
     Object.assign(cmp, Vue.prototype[property].options, options)
     document.body.appendChild(cmp.$mount().$el)
   }
 
-  function show(message, options = {}) {
+  function show (message, options = {}) {
     if (cmp) {
       cmp.close()
       Vue.nextTick(() => {
@@ -28,17 +28,17 @@ function init(Vue, options = {}) {
     return createCmp(options)
   }
 
-  function shorts(options) {
+  function shorts (options) {
     const colors = ['success', 'info', 'error', 'warning']
-    let methods = {}
+    const methods = {}
 
-    colors.forEach(color => {
-      methods[color] = (message, options) => show(message, {color, ...options})
+    colors.forEach((color) => {
+      methods[color] = (message, options) => show(message, { color, ...options })
     })
     if (options.shorts) {
-      for (let key in options.shorts) {
-        let localOptions = options.shorts[key]
-        methods[key] = (message, options) => show(message, {...localOptions, ...options})
+      for (const key in options.shorts) {
+        const localOptions = options.shorts[key]
+        methods[key] = (message, options) => show(message, { ...localOptions, ...options })
       }
     }
 

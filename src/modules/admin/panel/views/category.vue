@@ -107,13 +107,13 @@
 
 <script>
 import LocalUtils from '../utils/utils'
-import net from "@/common/libs/net/net"
+import net from '@/common/libs/net/net'
 import ApiMap from '../utils/api_map'
 
 export default {
-  data: function () {
+  data () {
     return {
-      dialog:{
+      dialog: {
         add_category: false,
         add_sub_category: false
       },
@@ -135,9 +135,10 @@ export default {
           return
         }
         this.new_category_submitting = true // todo loading.
-        net.apiPost(ApiMap.category.add,{
-          name: this.new_category_name,
-          slug: this.new_category_slug
+        net.apiPost(
+          ApiMap.category.add, {
+            name: this.new_category_name,
+            slug: this.new_category_slug
           }, net.axios.load_admin_jwt_config(),
           (data) => {
             if (data) {
@@ -153,27 +154,28 @@ export default {
             } else {
               this.$snackbar(this.$t('category.error_adding_category'))
             }
-          }, () => {    // on error(e.g. network)
+          }, () => { // on error(e.g. network)
             this.$snackbar(this.$t('category.error_adding_category'))
-          },(error) => { // on response error
-            for (let key in error) {
-              let message = error[key]
+          }, (error) => { // on response error
+            for (const key in error) {
+              const message = error[key]
               this.$snackbar(message)
               return
             }
-          }, () =>{ // on un_auth
+          }, () => { // on un_auth
             this.$snackbar(this.$t('common.error_auth_needed'))
           }, () => { // on finish
             this.dialog.add_category = false
             this.new_category_submitting = false
-          })
+          }
+        )
       }
     },
-    delCategory(id) {
-      id = id + 1
+    delCategory (id) {
+      id += 1
       return id
     },
-    openAddSubDialog(parent_id){
+    openAddSubDialog (parent_id) {
       // show dialog for adding sub category.
       this.new_sub_category_type = parent_id
       this.dialog.add_sub_category = true
@@ -185,50 +187,50 @@ export default {
       }
       // let _id = this.categories[index].id
       this.new_sub_category_submitting = true
-      let self = this
+      const self = this
       net.apiPost(ApiMap.category.sub_add, {
-          id: this.new_sub_category_type,
-          name: this.new_sub_category_name,
-          slug: this.new_sub_category_slug
-        }, net.axios.load_admin_jwt_config(), (data) => {
-          this.addSubToCategory(this.new_sub_category_type, data.addition, this.new_sub_category_name, this.new_sub_category_slug, 0)
-          self.new_sub_category_name = ''
-          self.new_sub_category_slug = ''
-          this.$snackbar('子分类添加成功')
-        },() => {    // on error(e.g. network)
-          this.$snackbar(this.$t('category.error_adding_sub_category'))
-        },(error) => { // on response error
-          for (let key in error) {
-            let message = error[key]
-            this.$snackbar(message)
-            return
-          }
-        }, () =>{ // on un_auth
-          this.$snackbar(this.$t('common.error_auth_needed'))
-        }, () => {
+        id: this.new_sub_category_type,
+        name: this.new_sub_category_name,
+        slug: this.new_sub_category_slug
+      }, net.axios.load_admin_jwt_config(), (data) => {
+        this.addSubToCategory(this.new_sub_category_type, data.addition, this.new_sub_category_name, this.new_sub_category_slug, 0)
+        self.new_sub_category_name = ''
+        self.new_sub_category_slug = ''
+        this.$snackbar('子分类添加成功')
+      }, () => { // on error(e.g. network)
+        this.$snackbar(this.$t('category.error_adding_sub_category'))
+      }, (error) => { // on response error
+        for (const key in error) {
+          const message = error[key]
+          this.$snackbar(message)
+          return
+        }
+      }, () => { // on un_auth
+        this.$snackbar(this.$t('common.error_auth_needed'))
+      }, () => {
         this.new_sub_category_submitting = false
         this.dialog.add_sub_category = false
-      }
-      )
+      })
     },
-    addSubToCategory(parent_id, id, name, slug, count) {
-      let len = this.categories.length
-      for(let i = 0; i<len; i++){
-        if(this.categories[i].id === parent_id){
+    addSubToCategory (parent_id, id, name, slug, count) {
+      const len = this.categories.length
+      for (let i = 0; i < len; i++) {
+        if (this.categories[i].id === parent_id) {
           this.categories[i].sub_category.push({
-            id: id, name:name,
-            slug: slug,
+            id,
+            name,
+            slug,
             posts_count: count
           })
           break
         }
       }
     },
-    delSubCategory(id) {
+    delSubCategory (id) {
       return id++
     }
   },
-  created: function () {
+  created () {
     LocalUtils.loadCategories(this, this.categories)
   }
 }

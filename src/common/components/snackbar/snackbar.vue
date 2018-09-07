@@ -23,92 +23,92 @@
 </template>
 
 <script>
-  export default {
-    name: "snackbar",
-    data() {
-      return {
-        active: false,
-      }
+export default {
+  name: 'snackbar',
+  data () {
+    return {
+      active: false
+    }
+  },
+  props: {
+    dismissable: {
+      type: Boolean,
+      default: true
     },
-    props: {
-      dismissable: {
-        type: Boolean,
-        default: true,
-      },
-      dismissText: {
-        type: String,
-        default: 'Close',
-      },
-      icon: {
-        type: String,
-        default: undefined,
-      },
-      absolute: {
-        type: Boolean,
-        default: false
-      },
-      autoHeight: {
-        type: Boolean,
-        default: false
-      },
-      bottom: {
-        type: Boolean,
-        default: true
-      },
-      left: {
-        type: Boolean,
-        default: false
-      },
-      top: {
-        type: Boolean,
-        default: false
-      },
-      right: {
-        type: Boolean,
-        default: false
-      },
-      color: {
-        type: String,
-        default: undefined
-      },
-      dismissColor: {
-        type: String,
-        default: 'pink'
-      },
-      multiLine: {
-        type: Boolean,
-        default: false
-      },
-      timeout: {
-        type: Number,
-        default: 3000
-      },
-      vertical: {
-        type: Boolean,
-        default: false
-      },
-      value: {
-        type: Object | Boolean | Number,
-        default: undefined,
-      }
+    dismissText: {
+      type: String,
+      default: 'Close'
     },
-    mounted() {
-      this.$nextTick(() => this.show())
+    icon: {
+      type: String,
+      default: undefined
     },
-    methods: {
-      show() {
-        this.active = true
-      },
-      close() {
+    absolute: {
+      type: Boolean,
+      default: false
+    },
+    autoHeight: {
+      type: Boolean,
+      default: false
+    },
+    bottom: {
+      type: Boolean,
+      default: true
+    },
+    left: {
+      type: Boolean,
+      default: false
+    },
+    top: {
+      type: Boolean,
+      default: false
+    },
+    right: {
+      type: Boolean,
+      default: false
+    },
+    color: {
+      type: String,
+      default: undefined
+    },
+    dismissColor: {
+      type: String,
+      default: 'pink'
+    },
+    multiLine: {
+      type: Boolean,
+      default: false
+    },
+    timeout: {
+      type: Number,
+      default: 3000
+    },
+    vertical: {
+      type: Boolean,
+      default: false
+    },
+    value: {
+      type: Object | Boolean | Number,
+      default: undefined
+    }
+  },
+  mounted () {
+    this.$nextTick(() => this.show())
+  },
+  methods: {
+    show () {
+      this.active = true
+    },
+    close () {
+      this.active = false
+    },
+    dismiss () {
+      if (this.dismissable) {
         this.active = false
-      },
-      dismiss() {
-        if (this.dismissable) {
-          this.active = false
-        }
       }
     }
   }
+}
 </script>
 
 <style scoped>

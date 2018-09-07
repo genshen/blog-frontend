@@ -123,7 +123,7 @@
 <script>
 import ProgressBar from 'vue-progressbar'
 import ApiMap from './api_map'
-import {StateInit, UpdateAllState} from './store/mulations_type'
+import { StateInit, UpdateAllState } from './store/mulations_type'
 import net from '@/common/libs/net/net'
 
 export default {
@@ -140,17 +140,17 @@ export default {
   components: {
     ProgressBar
   },
-  methods:{},
-  mounted() {
+  methods: {},
+  mounted () {
     this.$store.commit(StateInit)
   },
   created () {
     net.axiosInstance.get(ApiMap.app.settings)
       .then((response) => {
-        if(response && response.data){
+        if (response && response.data) {
           this.$store.commit(UpdateAllState, response.data)
         }
-    })
+      })
   }
 }
 </script>

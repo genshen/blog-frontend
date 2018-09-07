@@ -22,17 +22,17 @@ const ADMIN_SIGN_OUT_PATH = Config.ajaxDomain + Config.pages.admin_signout_page
 const map = {
   common: {
     prefix: ADMIN_PREFIX,
-    upload_token: ADMIN_API_PREFIX + '/upload_token'
+    upload_token: `${ADMIN_API_PREFIX}/upload_token`
   },
   article: {
-    list: API_PREFIX + '/list',
-    publish: ADMIN_API_PREFIX + '/article/publish',
+    list: `${API_PREFIX}/list`,
+    publish: `${ADMIN_API_PREFIX}/article/publish`,
     edit: ''
   },
   category: {
-    get: API_PREFIX + '/categories',
-    add: ADMIN_API_PREFIX + '/category/add',
-    sub_add: ADMIN_API_PREFIX + '/sub_category/add'
+    get: `${API_PREFIX}/categories`,
+    add: `${ADMIN_API_PREFIX}/category/add`,
+    sub_add: `${ADMIN_API_PREFIX}/sub_category/add`
   },
   sign_out: ADMIN_SIGN_OUT_PATH
 }

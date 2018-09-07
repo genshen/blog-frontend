@@ -249,8 +249,8 @@ export default {
     }
   },
   created () {
-    let self = this
-    $.get(ApiMap.app.settings, function (data) {
+    const self = this
+    $.get(ApiMap.app.settings, (data) => {
       self.settings = data.settings
       self.categories = data.categories
       self.settings.is_auth = data.is_auth
@@ -260,21 +260,21 @@ export default {
     })
   },
   mounted () {
-    let self = this
-    window.addEventListener('message', function (e) {
+    const self = this
+    window.addEventListener('message', (e) => {
       if (e.origin === location.origin) {
-        let data = e.data
+        const data = e.data
         if (data.status === 1) {
           self.settings.is_auth = true
           self.settings.user = data
-          Util.ui.snackbar({alive: 3000, content: '登录认证成功'})
+          Util.ui.snackbar({ alive: 3000, content: '登录认证成功' })
         }
       }
     })
   },
   methods: {
     openGithub () {
-      let url = this.settings.auth_sites.github.url + this.settings.auth_sites.github.client_id
+      const url = this.settings.auth_sites.github.url + this.settings.auth_sites.github.client_id
       window.open(url, '', 'location=no,status=no')
       $('#auth_model').modal('hide')
     }

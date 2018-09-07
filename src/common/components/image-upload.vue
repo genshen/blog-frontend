@@ -43,14 +43,14 @@
 </template>
 
 <script>
-import net from "@/common/libs/net/net"
+import net from '@/common/libs/net/net'
 
-  /**
-   * props:
-   *   customUpload: be false by default;
-   *   data: addition data(key-value) in HTTP-Post body.(using FormData)
-   *  event: @on-success=func(image,data);@on-fail=func(image,error) ; @on-upload=func(image,optional)
-*/
+/**
+ * props:
+ *   customUpload: be false by default;
+ *   data: addition data(key-value) in HTTP-Post body.(using FormData)
+ *  event: @on-success=func(image,data);@on-fail=func(image,error) ; @on-upload=func(image,optional)
+ */
 export default {
   data () {
     return {
@@ -89,7 +89,7 @@ export default {
     }
   },
   methods: {
-    addUploadImage: function () {
+    addUploadImage () {
       $('#upload_image_input').trigger('click') // token checker?
     },
     reTryUpload (index) {
@@ -103,10 +103,10 @@ export default {
       }
     },
     onUploadImageSelected () {
-      let files = $('#upload_image_input')[0].files
+      const files = $('#upload_image_input')[0].files
       for (let i = 0; i < files.length; i++) {
-        let src = window.URL.createObjectURL(files[i])
-        let image = {src: src, status: 0, file: files[i]}
+        const src = window.URL.createObjectURL(files[i])
+        const image = { src, status: 0, file: files[i] }
         this.images.push(image)
         this.uploadImageToServer(image)
       }
@@ -120,10 +120,10 @@ export default {
         // todo toast error.
         return
       }
-      let data = new FormData()
+      const data = new FormData()
       data.append('file', image.file)
       if (this.option.data) { // add additional data to formData.
-        for (let key in this.option.data) {
+        for (const key in this.option.data) {
           data.append(key, this.option.data[key])
         }
       }
@@ -132,9 +132,9 @@ export default {
         .then((response) => {
           this.$emit('on-success', image, response.data)
         }).catch((err) => {
-        image.status = -1
-        this.$emit('on-fail', image, err)
-      })
+          image.status = -1
+          this.$emit('on-fail', image, err)
+        })
     }
   }
 }

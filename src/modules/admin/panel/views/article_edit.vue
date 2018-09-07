@@ -26,7 +26,6 @@
       </v-card>
     </v-dialog>
 
-
     <v-tabs fixed-tabs>
       <v-tab>
         {{ $t("posts.edit.tab_title_edit") }}
@@ -104,17 +103,17 @@ import Markdown from '@/common/components/markdown'
 import ImageUpload from '@/common/components/image-upload'
 import LocalUtils from '../utils/utils'
 import ApiMap from '../utils/api_map'
-import net from "@/common/libs/net/net"
+import net from '@/common/libs/net/net'
 
 const CATEGORY_ID_EMPTY = 0
 export default {
-  data: function () {
+  data () {
     return {
       categories: [],
       upload: {
         image_file_domain: '',
-        upload_config: {upload_path: '', custom_upload: false, data: {}},
-        image_upload_status: false,
+        upload_config: { upload_path: '', custom_upload: false, data: {} },
+        image_upload_status: false
       },
       // images: [], // {src:"blobUrl",status:0,file:fileObject}  //status:-1上传失败,0等待上传,1正在上传,2上传完成
       article: {
@@ -123,13 +122,13 @@ export default {
         field_tags: '',
         category_id: CATEGORY_ID_EMPTY,
         sub_category_id: CATEGORY_ID_EMPTY,
-        article_content: '',
+        article_content: ''
       },
       submit_loader: {
         loading: false
       },
       show_image_dialog: false,
-      test_tags: ["ABC","Alg", "Go"]
+      test_tags: ['ABC', 'Alg', 'Go']
     }
   },
   components: {
@@ -139,7 +138,7 @@ export default {
   methods: {
     onImageUploadSuccess (image, data) {
       try {
-        this.article.article_content += '![image](' + this.upload.image_file_domain + data.key + ')\r\n' // qiniu file upload.
+        this.article.article_content += `![image](${this.upload.image_file_domain}${data.key})\r\n` // qiniu file upload.
         image.status = 2
       } catch (e) {
         image.status = -1
@@ -189,7 +188,7 @@ export default {
   },
   computed: {
     sub_category_items () {
-      for (let i in this.categories) {
+      for (const i in this.categories) {
         if (this.categories[i].id === this.article.category_id) {
           return this.categories[i].sub_category
         }
@@ -211,7 +210,7 @@ export default {
             if (!this.upload.upload_config.custom_upload) {
               // add cookie for _xsrf
               try { // cookie may be null or something else bad data
-                let xsrf = net.getXSRFCookie()
+                const xsrf = net.getXSRFCookie()
                 this.upload.upload_config.data._xsrf = xsrf
               } catch (err) {
                 this.$snackbar(this.$t('common.error_getting_config'))
@@ -222,8 +221,8 @@ export default {
           this.$snackbar(this.$t('common.error_getting_config'))
         }
       }).catch(() => { // todo add un-auth snackbar.
-      this.$snackbar(this.$t('common.error_getting_config'))
-    })
+        this.$snackbar(this.$t('common.error_getting_config'))
+      })
   }
 }
 </script>

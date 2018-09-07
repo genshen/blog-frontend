@@ -1,3 +1,1 @@
-export const is_auth = () =>{
-  return false
-}
+export const is_auth = () => false

@@ -36,7 +36,7 @@
 <script>
 import MarkdownIt from 'markdown-it'
 import Prism from '@/common/libs/prism/prismjs'
-import '@/common/libs/prism/themes/prism.css';
+import '@/common/libs/prism/themes/prism.css'
 
 export default {
   name: 'markdown',
@@ -47,16 +47,16 @@ export default {
     }
   },
   data () {
-    return {markdownInstance: null}
+    return { markdownInstance: null }
   },
   computed: {
-    markedHtml: function () {
+    markedHtml () {
       return this.markdownInstance.render(this.marked)
     }
   },
   created () {
     this.markdownInstance = new MarkdownIt({
-      highlight: function (code, lang) {
+      highlight (code, lang) {
         if (code) {
           try {
             return Prism.highlight(code, Prism.languages[lang], lang)

@@ -3,26 +3,25 @@ import Cookies from 'js-cookie'
 import util from '../utils/util'
 import Config from '../../config/config'
 
-let net = {}
+const net = {}
 
 net.axiosInstance = axios.create({
   timeout: 30000,
   transformRequest: [function (data) {
     // Do whatever you want to transform the data
     let ret = ''
-    for (let it in data) {
-      ret += encodeURIComponent(it) + '=' + encodeURIComponent(data[it]) + '&'
+    for (const it in data) {
+      ret += `${encodeURIComponent(it)}=${encodeURIComponent(data[it])}&`
     }
     return ret
   }],
-  headers: {'Content-Type': 'application/x-www-form-urlencoded'}
+  headers: { 'Content-Type': 'application/x-www-form-urlencoded' }
 })
 
 net.axiosFileInstance = axios.create({
   timeout: 30000,
-  headers: {'Content-Type': 'multipart/form-data'}
+  headers: { 'Content-Type': 'multipart/form-data' }
 })
-
 
 net.getXSRFCookie = function () {
   try { // cookie may be null or something else bad data
@@ -74,7 +73,7 @@ net.apiPost = function (target, data, config, onSuccess, onError, onResponseErro
     data._xsrf = xsrf
   }
 
-  net.axiosInstance.post(target, data, config).then(function (response) {
+  net.axiosInstance.post(target, data, config).then((response) => {
     try { // process response data
       switch (response.data.status) {
         case 0:
@@ -93,7 +92,7 @@ net.apiPost = function (target, data, config, onSuccess, onError, onResponseErro
       onError(error)
       cleanup(4, 'error in processing response')
     }
-  }).catch(error => {
+  }).catch((error) => {
     // console.log(error.response)
     if (error.response.status === 401) {
       onUnAuth()
@@ -107,12 +106,11 @@ net.apiPost = function (target, data, config, onSuccess, onError, onResponseErro
 
 net.axios = {}
 net.axios.load_admin_jwt_config = () => {
-  let jwt = sessionStorage.getItem(Config.axios.jwt_session_name_admin)
+  const jwt = sessionStorage.getItem(Config.axios.jwt_session_name_admin)
   if (jwt) {
-    return {headers: {"Authorization": "Bearer " + jwt}}
-  } else {
-    return {}
+    return { headers: { Authorization: `Bearer ${jwt}` } }
   }
+  return {}
 }
 
 export default net

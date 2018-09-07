@@ -14,15 +14,15 @@ const routersMap = [
     meta: {
       title: 'Home'
     },
-    component: (resolve) => require(['./views/list.vue'], resolve)
+    component: resolve => require(['./views/list.vue'], resolve)
   }, {
     path: '/category/:menu/:sub_menu',
     name: 'category',
-    component: (resolve) => require(['./views/list.vue'], resolve)
+    component: resolve => require(['./views/list.vue'], resolve)
   }, {
     path: '/detail/:id',
     name: 'detail',
-    component: (resolve) => require(['./views/detail.vue'], resolve)
+    component: resolve => require(['./views/detail.vue'], resolve)
     // route level code-splitting
     // this generates a separate chunk (about.[hash].js) for this route
     // which is lazy-loaded when the route is visited.

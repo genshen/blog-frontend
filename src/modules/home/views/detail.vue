@@ -100,14 +100,14 @@
 <script>
 import Markdown from '@/common/components/markdown'
 // import Config from '@/common/config/config'
-import {OnAuth} from '../store/mulations_type'
+import { OnAuth } from '../store/mulations_type'
 import ApiMap from '../api_map'
 import Util from '@/common/libs/utils/util'
 import net from '@/common/libs/net/net'
-import Comment from "./comp_post_comment"
+import Comment from './comp_post_comment'
 
 export default {
-  data: function () {
+  data () {
     return {
       article: {
         id: '',
@@ -121,19 +121,19 @@ export default {
         created_at: '',
         updated_at: ''
       },
-      dialogs:{
+      dialogs: {
         auth: false
       }
     }
   },
   computed: {
-    settings() {
+    settings () {
       return this.$store.state
     },
-    comment_add_url() {
+    comment_add_url () {
       return ApiMap.detail.commentAdd
     },
-    reply_add_url() {
+    reply_add_url () {
       return ApiMap.detail.replyAdd
     }
   },
@@ -142,32 +142,31 @@ export default {
   },
   methods: {
     // open auth dialog.
-    onUnAuth() {
+    onUnAuth () {
       this.dialogs.auth = true
     },
-    openForAuth(auth_site){
+    openForAuth (auth_site) {
       if (!auth_site) {
         this.$snackbar(this.$t('auth.fail_open_auth_site'))
         return
       }
-      let url = auth_site.url + auth_site.client_id
+      const url = auth_site.url + auth_site.client_id
       window.open(url, '', 'location=no,status=no')
     },
-    onOAuth2Passed(event) { // oauth2 callback post message
+    onOAuth2Passed (event) { // oauth2 callback post message
       if (event.origin === location.origin) {
         if (event.data.status === 1) { // ok
           this.$store.commit(OnAuth, event.data.addition) // set on-auth and save jwt to localStorage.
           this.$snackbar(this.$t('auth.message_auth_success'))
           // close dialog
           this.dialogs.auth = false
-          return
         }
-        //else{
+        // else{
         // in dev mode, some webSocket message will reach this branch.
         // if(!Config.isDevMode()) {
         //   this.$snackbar(this.$t('auth.callback_message_error'))
         // }
-       // }
+        // }
       }
     }
   },
@@ -180,10 +179,10 @@ export default {
   created () {
     net.axiosInstance.get(ApiMap.detail.content(this.$route.params.id))
       .then((response) => { // what if it is not json?
-        let data = response.data
+        const data = response.data
         try {
           if (!data.id) {
-           this.$snackbar(this.$t('post.detail.article_not_found'))
+            this.$snackbar(this.$t('post.detail.article_not_found'))
             return
           }
           if (!data.cover) {
@@ -194,8 +193,8 @@ export default {
           this.$snackbar(Util.messages.NormalErrorSnackBar)
         }
       }).catch(() => {
-      this.$snackbar(Util.messages.NormalErrorSnackBar)
-    })
+        this.$snackbar(Util.messages.NormalErrorSnackBar)
+      })
   }
 }
 </script>

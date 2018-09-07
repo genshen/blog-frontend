@@ -10,8 +10,8 @@ const lsLang = (localLang === 'zh' || localLang === 'en') ? localLang : false
 const lang = lsLang || navLang || 'zh'
 
 const messages = {
-  'zh': locales['zh-CN'],
-  'en': locales['en-US']
+  zh: locales['zh-CN'],
+  en: locales['en-US']
 }
 
 // Create VueI18n instance with options

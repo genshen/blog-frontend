@@ -59,7 +59,7 @@ export default {
   data: () => ({
     drawer: null,
     items: [
-      { icon: 'home', text: 'Home', link: { name:'panel' } },
+      { icon: 'home', text: 'Home', link: { name: 'panel' } },
       { icon: 'touch_app', text: 'Reminders' },
       { divider: true },
       { heading: 'Labels' },

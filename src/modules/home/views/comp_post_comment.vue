@@ -147,233 +147,232 @@
 </template>
 
 <script>
-  import ApiMap from '../api_map'
-  import {OnUnAuth} from '../store/mulations_type'
-  import * as CC from './comment_config'
-  import CommentLoadStatus from './comp_comment_load_status'
-  import Util from '@/common/libs/utils/util'
-  import net from '@/common/libs/net/net'
+import ApiMap from '../api_map'
+import { OnUnAuth } from '../store/mulations_type'
+import * as CC from './comment_config'
+import CommentLoadStatus from './comp_comment_load_status'
+import Util from '@/common/libs/utils/util'
+import net from '@/common/libs/net/net'
 
-  export default {
-    name: "post_comment",
-    data() {
-      return {
-        comments: [],
-        comments_loaded_count: 0,
-        comment_load_status: CC.COM_STATUS_UNINIT,
-        comment_text: ''
-      }
+export default {
+  name: 'post_comment',
+  data () {
+    return {
+      comments: [],
+      comments_loaded_count: 0,
+      comment_load_status: CC.COM_STATUS_UNINIT,
+      comment_text: ''
+    }
+  },
+  props: {
+    lazy_loading: {
+      type: Boolean,
+      default: false
     },
-    props: {
-      lazy_loading: {
-        type: Boolean,
-        default: false,
-      },
-      post_id: {
-        required: true,
-        type: String,
-      },
-      comments_count: {
-        type: Number,
-        default: 0,
-      },
-      reply_count: {
-        type: Number,
-        default: 0,
-      },
-      comment_add_url: {
-        required: true,
-        type: String,
-      },
-      reply_add_url: {
-        required: true,
-        type: String,
-      }
+    post_id: {
+      required: true,
+      type: String
     },
-    components: {
-      CommentLoadStatus
+    comments_count: {
+      type: Number,
+      default: 0
     },
-    watch: {
-      // if post id changed (the post id have initialized)
-      post_id(new_id) {
-        if (new_id) {
-          this.loadComment()
-        }
-      }
+    reply_count: {
+      type: Number,
+      default: 0
     },
-    computed: {
-      is_auth() {
-        return this.$store.state.is_oauth2_passed
-      },
-      oauth2_jwt() {
-        return this.$store.state.oauth2_jwt
-      },
-      user() {
-        return this.$store.state.user // including avatar_url, html_url, email, name.
-      }
+    comment_add_url: {
+      required: true,
+      type: String
     },
-    methods: {
-      onMessage(message) {
-        this.$snackbar(message)
-      },
-      tryJwtFailed() {
-        this.$store.commit(OnUnAuth)  // clear localStorage data and reset {is_oauth2_passed} state to false.
-        this.$snackbar(this.$t('auth.snackbar_comment_or_reply_auth_needed')) // show snackbar message
-        this.$emit('on-un-auth') // open auth dialog.
-      },
-      lazyLoadComment() {
-        if (document.getElementById('comment-flag').offsetTop < document.documentElement.clientHeight) {
-          this.loadComment()
-        } else {
-          let self = this
-          $(window).scroll(function () {
-            if (document.getElementById('comment-flag').offsetTop - document.body.scrollTop <
-              document.documentElement.clientHeight) {
-              $(window).unbind('scroll')
-              self.loadComment()
-            }
-          })
-        }
-      },
-      loadComment() {
-        if (this.comment_load_status === CC.COM_STATUS_INIT_LOADING || this.comment_load_status === CC.COM_STATUS_LOADING) {
-          return
-        }
-        let start = this.comments_loaded_count
-        this.comment_load_status = (start === 0 ? CC.COM_STATUS_INIT_LOADING : CC.COM_STATUS_LOADING)
-        net.axiosInstance.get(ApiMap.detail.comments(this.post_id, start)) // todo generating url
-          .then((response) => {
-            try {
-              if (!(response && response.data)) {
-                this.onMessage(this.$t('post.comment.error_load_fail')) // todo data error and snackbar and error text.
-                return
-              }
-              let data = response.data
-              data.forEach((e) => {
-                if (!this.containsComment(e.id)) { // todo array sort.
-                  e.show_reply_box = false
-                  e.new_reply_content = ''
-                  this.comments.push(e)
-                }
-              })
-              this.comments_loaded_count += data.length
-              this.comment_load_status = (data.length === CC.maxCommentLength ?
-                CC.COM_STATUS_INIT_LOADED_HAS_MORE : CC.COM_STATUS_INIT_LOADED_NO_MORE) // 2(has more) or 3(not more)
-            } catch (err) {
-              this.onMessage(this.$t('post.comment.error_load_fail'))
-              this.comment_load_status = (start === 0 ? CC.COM_STATUS_INIT_FAIL : CC.COM_STATUS_LOAD_FAIL)
-            }
-          })
-          .catch(() => {
-            this.onMessage(this.$t('post.comment.error_load_fail'))
-            this.comment_load_status = (start === 0 ? CC.COM_STATUS_INIT_FAIL : CC.COM_STATUS_LOAD_FAIL)
-          })
-      },
-      containsComment(id) { // todo maybe not sort by id.
-        let h = this.comments.length - 1
-        let l = 0
-        while (l <= h) {
-          let m = Math.floor((h + l) / 2)
-          if (this.comments[m].id === id) {
-            return true
-          }
-          if (id > this.comments[m].id) {
-            l = m + 1
-          } else {
-            h = m - 1
-          }
-        }
-        return false
-      },
-      submitComment: function () {
-        if (this.comment_text === '') {
-          this.onMessage('评论内容不能为空')
-          return
-        }
-        if (!this.is_auth) {
-          this.$emit('on-un-auth')
-          return
-        }
-
-        net.apiPost(this.comment_add_url, {
-            post_id: this.post_id,
-            content: this.comment_text
-          }, {
-            headers: {"Authorization": "Bearer " + this.oauth2_jwt}
-          }, (data) => { // success
-            this.comments.unshift({
-              content: this.comment_text,
-              create_at: (new Date()).getTime(),
-              id: data.addition,
-              replies: [],
-              status: 1,
-              user: this.user,   // fixme
-              show_reply_box: false,
-              new_reply_content: ''
-            })
-            this.comment_text = ''
-            this.onMessage(this.$t('post.comment.adding_comment_success'))
-          }, () => { // on error
-            this.onMessage(this.$t('post.comment.error_adding_comment'))
-          }, (error) => { // on response error
-            this.onMessage(error) // error is just error message.
-          }, () => { // on un_auth
-            this.tryJwtFailed()
-          }
-        )
-      },
-      submitReply: function (commentIndex) {
-        let commentSelf = this.comments[commentIndex]
-        if (commentSelf.new_reply_content === '') {
-          this.onMessage('回复内容不能为空')
-          return
-        }
-        if (!this.settings.is_auth) {
-          $('#auth_model').modal('show')
-          return
-        }
-        let self = this
-        Util.network.postData.init(this.reply_add_url, {
-          comment_id: commentSelf.id, content: commentSelf.new_reply_content
-        }, null, function (data) {
-          try {
-            commentSelf.replies.push({
-              content: commentSelf.new_reply_content,
-              create_at: (new Date()).getTime(),
-              // todo (new Date()).getTime() => 1502112870976. it is not like this:[2017-08-07T21:25:50.248+08:00], used for DOM element title value
-              id: data.Addition,
-              status: 1,
-              user: self.settings.user
-            })
-            commentSelf.new_reply_content = ''
-            commentSelf.show_reply_box = false
-            this.onMessage('回复成功')
-          } catch (e) {
-            this.onMessage('出了点错误,请重试')
-          }
-        }, function () {
-          this.onMessage(Util.messages.NoAuthReplySnackBar)
-        })
-      },
-      cancelReply: function (commentIndex) {
-        this.comments[commentIndex].show_reply_box = false
-      },
-      toggleReplyBox: function (commentIndex, replyIndex) { // -1 ->is comment
-        let atOne
-        if (replyIndex < 0) {
-          atOne = this.comments[commentIndex].user.name
-        } else {
-          atOne = this.comments[commentIndex].replies[replyIndex].user.name
-        }
-        this.comments[commentIndex].show_reply_box = true
-        this.comments[commentIndex].new_reply_content = '@' + atOne
-        // console.log($("#reply-box-"+commentIndex));
-        setTimeout(function () {
-          let box = $('#reply-box-' + commentIndex)
-          box.trigger('change')
-          box.trigger('focus')
-        }, 200)
+    reply_add_url: {
+      required: true,
+      type: String
+    }
+  },
+  components: {
+    CommentLoadStatus
+  },
+  watch: {
+    // if post id changed (the post id have initialized)
+    post_id (new_id) {
+      if (new_id) {
+        this.loadComment()
       }
     }
+  },
+  computed: {
+    is_auth () {
+      return this.$store.state.is_oauth2_passed
+    },
+    oauth2_jwt () {
+      return this.$store.state.oauth2_jwt
+    },
+    user () {
+      return this.$store.state.user // including avatar_url, html_url, email, name.
+    }
+  },
+  methods: {
+    onMessage (message) {
+      this.$snackbar(message)
+    },
+    tryJwtFailed () {
+      this.$store.commit(OnUnAuth) // clear localStorage data and reset {is_oauth2_passed} state to false.
+      this.$snackbar(this.$t('auth.snackbar_comment_or_reply_auth_needed')) // show snackbar message
+      this.$emit('on-un-auth') // open auth dialog.
+    },
+    lazyLoadComment () {
+      if (document.getElementById('comment-flag').offsetTop < document.documentElement.clientHeight) {
+        this.loadComment()
+      } else {
+        const self = this
+        $(window).scroll(() => {
+          if (document.getElementById('comment-flag').offsetTop - document.body.scrollTop <
+              document.documentElement.clientHeight) {
+            $(window).unbind('scroll')
+            self.loadComment()
+          }
+        })
+      }
+    },
+    loadComment () {
+      if (this.comment_load_status === CC.COM_STATUS_INIT_LOADING || this.comment_load_status === CC.COM_STATUS_LOADING) {
+        return
+      }
+      const start = this.comments_loaded_count
+      this.comment_load_status = (start === 0 ? CC.COM_STATUS_INIT_LOADING : CC.COM_STATUS_LOADING)
+      net.axiosInstance.get(ApiMap.detail.comments(this.post_id, start)) // todo generating url
+        .then((response) => {
+          try {
+            if (!(response && response.data)) {
+              this.onMessage(this.$t('post.comment.error_load_fail')) // todo data error and snackbar and error text.
+              return
+            }
+            const data = response.data
+            data.forEach((e) => {
+              if (!this.containsComment(e.id)) { // todo array sort.
+                e.show_reply_box = false
+                e.new_reply_content = ''
+                this.comments.push(e)
+              }
+            })
+            this.comments_loaded_count += data.length
+            this.comment_load_status = (data.length === CC.maxCommentLength
+              ? CC.COM_STATUS_INIT_LOADED_HAS_MORE : CC.COM_STATUS_INIT_LOADED_NO_MORE) // 2(has more) or 3(not more)
+          } catch (err) {
+            this.onMessage(this.$t('post.comment.error_load_fail'))
+            this.comment_load_status = (start === 0 ? CC.COM_STATUS_INIT_FAIL : CC.COM_STATUS_LOAD_FAIL)
+          }
+        })
+        .catch(() => {
+          this.onMessage(this.$t('post.comment.error_load_fail'))
+          this.comment_load_status = (start === 0 ? CC.COM_STATUS_INIT_FAIL : CC.COM_STATUS_LOAD_FAIL)
+        })
+    },
+    containsComment (id) { // todo maybe not sort by id.
+      let h = this.comments.length - 1
+      let l = 0
+      while (l <= h) {
+        const m = Math.floor((h + l) / 2)
+        if (this.comments[m].id === id) {
+          return true
+        }
+        if (id > this.comments[m].id) {
+          l = m + 1
+        } else {
+          h = m - 1
+        }
+      }
+      return false
+    },
+    submitComment () {
+      if (this.comment_text === '') {
+        this.onMessage('评论内容不能为空')
+        return
+      }
+      if (!this.is_auth) {
+        this.$emit('on-un-auth')
+        return
+      }
+
+      net.apiPost(this.comment_add_url, {
+        post_id: this.post_id,
+        content: this.comment_text
+      }, {
+        headers: { Authorization: `Bearer ${this.oauth2_jwt}` }
+      }, (data) => { // success
+        this.comments.unshift({
+          content: this.comment_text,
+          create_at: (new Date()).getTime(),
+          id: data.addition,
+          replies: [],
+          status: 1,
+          user: this.user, // fixme
+          show_reply_box: false,
+          new_reply_content: ''
+        })
+        this.comment_text = ''
+        this.onMessage(this.$t('post.comment.adding_comment_success'))
+      }, () => { // on error
+        this.onMessage(this.$t('post.comment.error_adding_comment'))
+      }, (error) => { // on response error
+        this.onMessage(error) // error is just error message.
+      }, () => { // on un_auth
+        this.tryJwtFailed()
+      })
+    },
+    submitReply (commentIndex) {
+      const commentSelf = this.comments[commentIndex]
+      if (commentSelf.new_reply_content === '') {
+        this.onMessage('回复内容不能为空')
+        return
+      }
+      if (!this.settings.is_auth) {
+        $('#auth_model').modal('show')
+        return
+      }
+      const self = this
+      Util.network.postData.init(this.reply_add_url, {
+        comment_id: commentSelf.id, content: commentSelf.new_reply_content
+      }, null, function (data) {
+        try {
+          commentSelf.replies.push({
+            content: commentSelf.new_reply_content,
+            create_at: (new Date()).getTime(),
+            // todo (new Date()).getTime() => 1502112870976. it is not like this:[2017-08-07T21:25:50.248+08:00], used for DOM element title value
+            id: data.Addition,
+            status: 1,
+            user: self.settings.user
+          })
+          commentSelf.new_reply_content = ''
+          commentSelf.show_reply_box = false
+          this.onMessage('回复成功')
+        } catch (e) {
+          this.onMessage('出了点错误,请重试')
+        }
+      }, function () {
+        this.onMessage(Util.messages.NoAuthReplySnackBar)
+      })
+    },
+    cancelReply (commentIndex) {
+      this.comments[commentIndex].show_reply_box = false
+    },
+    toggleReplyBox (commentIndex, replyIndex) { // -1 ->is comment
+      let atOne
+      if (replyIndex < 0) {
+        atOne = this.comments[commentIndex].user.name
+      } else {
+        atOne = this.comments[commentIndex].replies[replyIndex].user.name
+      }
+      this.comments[commentIndex].show_reply_box = true
+      this.comments[commentIndex].new_reply_content = `@${atOne}`
+      // console.log($("#reply-box-"+commentIndex));
+      setTimeout(() => {
+        const box = $(`#reply-box-${commentIndex}`)
+        box.trigger('change')
+        box.trigger('focus')
+      }, 200)
+    }
   }
+}
 </script>

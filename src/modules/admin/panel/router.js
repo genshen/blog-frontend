@@ -15,7 +15,7 @@ const routersMap = [
     meta: {
       title: 'Panel Home'
     },
-    component: (resolve) => require(['./views/panel.vue'], resolve)
+    component: resolve => require(['./views/panel.vue'], resolve)
   },
   {
     path: '/article/',
@@ -23,21 +23,21 @@ const routersMap = [
     meta: {
       title: 'Article List'
     },
-    component: (resolve) => require(['./views/article_list.vue'], resolve) // () => import('./views/article_list.vue')
+    component: resolve => require(['./views/article_list.vue'], resolve) // () => import('./views/article_list.vue')
   }, {
     path: '/article/edit',
     name: 'article_edit',
     meta: {
       title: 'Article Edit'
     },
-    component: (resolve) => require(['./views/article_edit.vue'], resolve)
+    component: resolve => require(['./views/article_edit.vue'], resolve)
   }, {
     path: '/settings/category',
     name: 'category',
     meta: {
       title: 'Category'
     },
-    component: (resolve) => require(['./views/category.vue'], resolve)
+    component: resolve => require(['./views/category.vue'], resolve)
   }
 ]
 

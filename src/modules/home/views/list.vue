@@ -55,9 +55,9 @@ import Util from '@/common/libs/utils/util'
 import net from '@/common/libs/net/net'
 
 export default {
-  data: function () {
+  data () {
     return {
-      lists: [],
+      lists: []
     }
   },
   methods: {},
@@ -67,22 +67,22 @@ export default {
       params: {
         show_summary: true,
         skip: 0,
-        count: 12,
+        count: 12
       }
     }).then((response) => {
-        try {
-          this.$Progress.finish()
-          for(let i in response.data){
-            if (!response.data[i].cover) {
-              response.data[i].cover = '/static/assets/imgs/brand.jpg' // todo
-            }
-            this.lists.push(response.data[i])
+      try {
+        this.$Progress.finish()
+        for (const i in response.data) {
+          if (!response.data[i].cover) {
+            response.data[i].cover = '/static/assets/imgs/brand.jpg' // todo
           }
-        } catch (err) {
-          this.$Progress.fail()
-          this.$snackbar(Util.messages.SnackbarErrorMessage)
+          this.lists.push(response.data[i])
         }
-      })
+      } catch (err) {
+        this.$Progress.fail()
+        this.$snackbar(Util.messages.SnackbarErrorMessage)
+      }
+    })
       .catch(function () {
         this.$Progress.fail()
         this.$snackbar(Util.messages.SnackbarErrorMessage)
