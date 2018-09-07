@@ -15,7 +15,9 @@ let config = {
   },
   axios: {
     jwt_session_name_admin: '_jwt',
-    jwt_token_request_name: '_jwt'
+    jwt_token_request_name: '_jwt',
+    jwt_oauth2_session_name: '_jwt_oauth2',
+    jwt_oauth2_session_request_name: '_jwt_oauth2',
   }
 }
 

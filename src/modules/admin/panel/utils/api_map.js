@@ -1,6 +1,7 @@
 import Config from '@/common/config/config'
 
 const ADMIN_API_PREFIX = Config.api.admin_api_prefix
+const API_PREFIX = Config.ajaxDomain + Config.api.blog_api_prefix
 const ADMIN_PREFIX = Config.pages.admin_prefix
 // const ADMIN_SIGN_IN_PATH = Config.ajaxDomain + ADMIN_PREFIX + '/auth/sign_in'
 const ADMIN_SIGN_OUT_PATH = Config.ajaxDomain + Config.pages.admin_signout_page
@@ -24,12 +25,12 @@ const map = {
     upload_token: ADMIN_API_PREFIX + '/upload_token'
   },
   article: {
-    list: Config.api.blog_api_prefix + '/list',
+    list: API_PREFIX + '/list',
     publish: ADMIN_API_PREFIX + '/article/publish',
     edit: ''
   },
   category: {
-    get: Config.api.blog_api_prefix + '/categories',
+    get: API_PREFIX + '/categories',
     add: ADMIN_API_PREFIX + '/category/add',
     sub_add: ADMIN_API_PREFIX + '/sub_category/add'
   },

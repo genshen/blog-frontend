@@ -1,115 +1,95 @@
 <style scoped>
+  .article-cover {
+    width: 100%;
+    height: 100%;
+    justify-content: center;
+    overflow: hidden;
+  }
 
+  .article-title a {
+    /*color:#50596c;*/
+    text-decoration: none;
+    text-shadow: 1px 1px 4px #eee;
+  }
 </style>
 <template>
-  <div class="container page-lists">
-
-    <v-snackbar
-      :timeout="snackbar_opotion.timeout"
-      :color="snackbar_opotion.color"
-      :multi-line="snackbar_opotion.multi_line"
-      :vertical="snackbar_opotion.vertical"
-      v-model="snackbar_opotion.show"
-    >
-      {{ snackbar_opotion.text }}
-      <v-btn flat color="pink" @click.native="snackbar_opotion.show = false">Close</v-btn>
-    </v-snackbar>
-
-    <div class="row">
-      <div v-for="blog in lists"  v-bind:key="blog.id" class="col-md-12 col-lg-10 col-lg-push-1">
-        <div class="card">
-          <div class="card-main">
-            <div class="card-header">
-              <div class="card-header-side pull-left">
-                <span>{{blog.create_at | formatTime}}</span>
-              </div>
-              <div class="card-inner">
-                <router-link :to="{name:'detail',params:{id:blog.id}}" class="card-heading">{{blog.title}}</router-link>
-              </div>
-            </div>
-            <div class="card-img">
-              <img alt="alt text" :src="blog.cover" style="width: 100%;">
-              <!--<p class="card-img-heading"></p>-->
-            </div>
-            <div class="card-inner">
-              <p>{{blog.summary}}</p>
-            </div>
-            <div class="card-action">
-              <div class="card-action-btn pull-left">
-                <router-link :to="{name:'detail',params:{id:blog.id}}"
-                             class="btn btn-flat waves-effect waves-attach" href="javascript:void(0)">
-                  <span class="icon">more_vert</span>&nbsp;Read More
+  <v-container fill-height>
+    <v-layout row wrap align-center>
+      <v-flex xs12 md10 offset-md1 v-for="blog in lists" :key="blog.id">
+        <v-card class="my-3" hover>
+          <v-img v-if="blog.cover" height="170" class="article-cover" :src="blog.cover"></v-img>
+          <v-card-title>
+            <v-layout row wrap>
+              <v-flex xs12 class="article-title">
+                <router-link :to="{name:'detail',params:{id:blog.id}}">
+                  <h3 class="headline blue-grey--text">{{ blog.title }}</h3>
                 </router-link>
-              </div>
-            </div>
-          </div>
-        </div>
-      </div>
-    </div>  <!--row-->
-  </div>
+              </v-flex>
+              <v-flex xs12>
+                <span class="grey--text text--lighten-1" :title="blog.create_at">{{blog.create_at | formatTime}}</span>
+              </v-flex>
+            </v-layout>
+          </v-card-title>
+          <v-card-text>
+            <v-layout row wrap>
+              <v-flex xs12>
+                {{ blog.summary }}
+              </v-flex>
+            </v-layout>
+          </v-card-text>
+          <v-divider></v-divider>
+          <v-card-actions>
+            <v-spacer></v-spacer>
+            <v-btn flat :to="{name:'detail',params:{id:blog.id}}" class="blue--text">
+              Read More
+            </v-btn>
+          </v-card-actions>
+        </v-card>
+      </v-flex>
+    </v-layout>
+  </v-container>
 </template>
 <script>
 import ApiMap from '../api_map'
 import Util from '@/common/libs/utils/util'
-import Net from '@/common/libs/net/net'
+import net from '@/common/libs/net/net'
 
 export default {
   data: function () {
     return {
       lists: [],
-      snackbar_opotion: {
-        show: false,
-        color: '',
-        multi_line: false,
-        vertical: false,
-        timeout: 6000,
-        text: ''
-      }
     }
   },
-  methods: {
-    handleStart () {
-      this.$Modal.info({
-        title: 'Bravo',
-        content: 'Now, enjoy the convenience of iView.'
-      })
-    },
-    snackbar (text) {
-      this.snackbar_opotion.text = text
-      this.snackbar_opotion.show = true
-    }
-  },
-  mounted () {
-  },
-  created: function () {
+  methods: {},
+  created () {
     this.$Progress.start()
-    let self = this
-    Net.axiosInstance.get(ApiMap.list.category, { // todo different category
+    net.axiosInstance.get(ApiMap.list.def, { // todo different category
       params: {
-        ID: 12345
+        show_summary: true,
+        skip: 0,
+        count: 12,
       }
-    })
-      .then(function (response) {
+    }).then((response) => {
         try {
-          self.$Progress.finish()
-          response.forEach(function (e) { // if it is not json?
-            if (!e.cover) {
-              e.cover = '/static/assets/imgs/brand.jpg'
+          this.$Progress.finish()
+          for(let i in response.data){
+            if (!response.data[i].cover) {
+              response.data[i].cover = '/static/assets/imgs/brand.jpg' // todo
             }
-            self.lists.push(e)
-          })
+            this.lists.push(response.data[i])
+          }
         } catch (err) {
-          self.$Progress.fail()
-          self.snackbar(Util.messages.SnackbarErrorMessage)
+          this.$Progress.fail()
+          this.$snackbar(Util.messages.SnackbarErrorMessage)
         }
       })
       .catch(function () {
-        self.$Progress.fail()
-        self.snackbar(Util.messages.SnackbarErrorMessage)
+        this.$Progress.fail()
+        this.$snackbar(Util.messages.SnackbarErrorMessage)
       })
   },
   route: {
-    data: function () {
+    data () {
       window.console.log('data!@')
     }
   }

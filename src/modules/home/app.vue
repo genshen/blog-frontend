@@ -1,4 +1,57 @@
 <style scoped>
+  /*top image*/
+  .top-landscape {
+    background-color: #000;
+    height: 144px;
+    position: relative;
+  }
+
+  .drawer-img {
+    width: 100%;
+    height: 100%;
+    position: absolute;
+    top: 0;
+    left: 0;
+    justify-content: center;
+    overflow: hidden;
+  }
+
+  .drawer-img img {
+    min-height: 100%;
+    width: 100%;
+    opacity: .5
+  }
+
+  /*image avatar*/
+  .drawer-avatar {
+    /*padding: 12px 16px;*/
+    padding: 24px 16px;
+    position: relative;
+  }
+
+  .drawer-avatar a {
+    text-decoration: none;
+  }
+
+  .drawer-avatar .name {
+    color: white;
+    margin-left: 8px;
+  }
+
+  .drawer-bio {
+    margin: 0 12px;
+    color: white;
+    position: absolute;
+    bottom: 12px; /*align to bottom (12px)*/
+  }
+
+  /* @media only screen and (min-width: 768px) {
+    .drawer-avatar {
+      padding-top: 24px;
+      padding-bottom: 24px;
+    }
+  }
+*/
   .ui-main-content {
     padding-bottom: 120px
   }
@@ -14,35 +67,48 @@
 </style>
 <template>
   <v-app id="inspire">
-    <v-navigation-drawer width="400" light fixed v-model="drawer" app>
-      <v-layout row wrap text-xs-center style="padding-top:48%;">
-        <v-flex xs12>
-          <v-avatar size="64" color="red">
-            <span class="white--text headline">G</span>
-          </v-avatar>
+    <v-navigation-drawer width="320" v-model="drawer" light floating app>
+      <v-layout row wrap>
+        <v-flex xs12 class="top-landscape">
+          <div class="drawer-img">
+            <img src="@/assets/landscape.jpg"/>
+          </div>
+          <div class="drawer-avatar">
+            <a :href="settings.profile.url" target="_blank">
+              <v-avatar v-if="settings.profile.avatar">
+                <img :src="settings.profile.avatar" alt="John">
+              </v-avatar>
+              <v-avatar v-else color="indigo">
+                <v-icon dark>account_circle</v-icon>
+              </v-avatar>
+              <span class="name">{{settings.profile.name}}</span>
+            </a>
+          </div>
+          <div class="drawer-bio">
+            <small>{{settings.profile.bio}}</small>
+          </div>
         </v-flex>
       </v-layout>
     </v-navigation-drawer>
 
-    <v-toolbar color="white" app>
+    <v-toolbar color="primary" scroll-off-screen dark app> <!--elevation-0-->
       <v-toolbar-side-icon @click.stop="drawer = !drawer"></v-toolbar-side-icon>
       <v-toolbar-title>Application</v-toolbar-title>
+      <!--<v-toolbar-title slot="extension" class="white&#45;&#45;text">Title</v-toolbar-title>-->
     </v-toolbar>
     <!--<progress-bar ref="topProgress"></progress-bar>-->
 
     <v-content>
-      <v-container fluid fill-height class="ui-main-content">
-        <router-view v-bind:settings="settings"></router-view>
-      </v-container>
+      <router-view class="ui-main-content"></router-view>
     </v-content>
 
-    <v-footer color="indigo" height="128" inset class="ui-footer footer">
+    <v-footer color="light" height="128" class="ui-footer footer">
       <div class="container">
         <div class="row">
           <div class="col-sm-12">
             <p>
               <a>关于</a>&nbsp;|
-              <a v-if="settings" :href="settings.site_info.source_code" target="_blank">Github</a>
+              <a v-if="settings.site_info.source_code" :href="settings.site_info.source_code" target="_blank">Github</a>
             </p>
             <p class="powered">
               Powered by <a href="https://beego.me/" target="_blank">Beego Framework</a>
@@ -57,51 +123,34 @@
 <script>
 import ProgressBar from 'vue-progressbar'
 import ApiMap from './api_map'
-import Util from '@/common/libs/utils/util'
+import {StateInit, UpdateAllState} from './store/mulations_type'
+import net from '@/common/libs/net/net'
 
 export default {
   data () {
     return {
-      drawer: true,
-      settings: null,
-      categories: null
+      drawer: true
+    }
+  },
+  computed: {
+    settings () {
+      return this.$store.state
     }
   },
   components: {
     ProgressBar
   },
+  methods:{},
+  mounted() {
+    this.$store.commit(StateInit)
+  },
   created () {
-    let self = this
-    $.get(ApiMap.app.settings, function (data) {
-      self.settings = data.settings
-      self.categories = data.categories
-      self.settings.is_auth = data.is_auth
-      if (data.user) {
-        self.settings.user = data.user
-      }
-    })
-  },
-  mounted () {
-    let self = this
-    window.addEventListener('message', function (e) {
-      if (e.origin === location.origin) {
-        let data = e.data
-        if (data.status === 1) {
-          self.settings.is_auth = true
-          self.settings.user = data
-          Util.ui.snackbar({alive: 3000, content: '登录认证成功'})
+    net.axiosInstance.get(ApiMap.app.settings)
+      .then((response) => {
+        if(response && response.data){
+          this.$store.commit(UpdateAllState, response.data)
         }
-      }
     })
-  },
-  methods: {
-    openGithub () {
-      let url = this.settings.auth_sites.github.url + this.settings.auth_sites.github.client_id
-      window.open(url, '', 'location=no,status=no')
-      $('#auth_model').modal('hide')
-    }
-  },
-  beforeDestroy () {
   }
 }
 </script>

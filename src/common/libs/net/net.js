@@ -44,19 +44,24 @@ net.getXSRFCookie = function () {
  */
 net.apiPost = function (target, data, config, onSuccess, onError, onResponseError, onUnAuth, cleanup) {
   if (!onSuccess) {
-    onSuccess = function () {}
+    onSuccess = function () {
+    }
   }
   if (!onError) {
-    onError = function () {}
+    onError = function () {
+    }
   }
   if (!onResponseError) {
-    onResponseError = function () {}
+    onResponseError = function () {
+    }
   }
   if (!onUnAuth) {
-    onUnAuth = function () {}
+    onUnAuth = function () {
+    }
   }
   if (!cleanup) {
-    cleanup = function () {}
+    cleanup = function () {
+    }
   }
 
   if (!Config.isDevMode()) { // ignore in dev mode
@@ -90,7 +95,7 @@ net.apiPost = function (target, data, config, onSuccess, onError, onResponseErro
     }
   }).catch(error => {
     // console.log(error.response)
-    if (error.status === 401) {
+    if (error.response.status === 401) {
       onUnAuth()
       cleanup(5, 'un auth')
     } else {
@@ -101,7 +106,7 @@ net.apiPost = function (target, data, config, onSuccess, onError, onResponseErro
 }
 
 net.axios = {}
-net.axios.load_admin_jwt_config = function () {
+net.axios.load_admin_jwt_config = () => {
   let jwt = sessionStorage.getItem(Config.axios.jwt_session_name_admin)
   if (jwt) {
     return {headers: {"Authorization": "Bearer " + jwt}}

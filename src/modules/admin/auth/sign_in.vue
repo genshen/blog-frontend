@@ -92,7 +92,6 @@
       </div>
     </v-footer>
   </v-app>
-
 </template>
 
 <script>

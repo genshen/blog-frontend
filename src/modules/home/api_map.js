@@ -6,7 +6,7 @@ const map = {
     settings: Config.ajaxDomain + '/settings'
   },
   list: {
-    category: API_PREFIX + '/category'
+    def: API_PREFIX + '/list'
   },
   detail: {
     content (postId) {
@@ -19,4 +19,5 @@ const map = {
     replyAdd: API_PREFIX + '/reply/add/'
   }
 }
+
 export default map

@@ -14,7 +14,7 @@ util.messages = {
 }
 
 util.ui = {
-  snackbar (v) {
+  snackbar(v) {
     $('body').snackbar(v)
   }
 }
@@ -67,6 +67,10 @@ util.network = {
           $('body').snackbar({content: '请<a href=\'' + url + '\'>登录</a>后进行操作', alive: options.snackBarAlive})
         }
       }
+      if (!onFinish) {
+        onFinish = () => {
+        }
+      }
     }
   },
   simpleParseError: {
@@ -98,7 +102,7 @@ util.network = {
 
 util.tools = {
   // base64_decode
-  base64_decode (encodedData) {
+  base64_decode(encodedData) {
     if (typeof window !== 'undefined') {
       if (typeof window.atob !== 'undefined') {
         return decodeURIComponent(unescape(window.atob(encodedData)))
@@ -145,7 +149,7 @@ util.tools = {
     dec = tmpArr.join('')
     return decodeURIComponent(escape(dec.replace(/\0+$/, '')))
   },
-  formatTime (value) {
+  formatTime(value) {
     if (typeof value !== 'number') {
       let v = Date.parse(value)
       if (isNaN(v)) {

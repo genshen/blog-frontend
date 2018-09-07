@@ -4,6 +4,7 @@
 // (runtime-only or standalone) has been set in webpack.base.conf with an alias.
 import Vue from 'vue'
 import '@/plugins/vuetify'
+import '@/plugins/vuetify_snackbar'
 import Util from '@/common/libs/utils/util'
 import SignIn from './sign_in.vue'
 
